@@ -2,7 +2,7 @@
   "name": "marchstone",
   "private": true,
   "type": "module",
-  "description": "Mark an area on a map and get warned by colour, sound and vibration at its edge. Runs in the phone's browser, works offline, no account.",
+  "description": "Mark an area on a map and get warned by colour, sound and vibration at its edge. Drop numbered, labelled points as you walk it and export them. Runs in the phone's browser, works offline, no account.",
   "author": {
     "name": "Kuba",
     "email": "kuba@tinkered.app"

@@ -5,8 +5,8 @@
 <h1 align="center">Marchstone</h1>
 
 <p align="center">
-  <b>Mark an area. Your phone tells you when you reach its edge.</b><br>
-  Inside, outside or on the border, by colour, sound and vibration.
+  <b>Mark an area and your phone warns you at its edge. Drop numbered points as you walk it.</b><br>
+  Boundaries and waypoints for work on the ground: draw or walk an area, label and move marks, export GPX, KML or GeoJSON.
 </p>
 
 <p align="center">
@@ -27,6 +27,11 @@ tells you whether you are **inside** it, **outside** it, or **on its edge**, by
 colour, sound and vibration. It answers "am I in this shape?" for any shape on the
 ground: fencing, spraying, surveying, foraging permissions, event boundaries,
 marking what to cut.
+
+It also keeps **marks**: numbered points dropped where you stand, each with a
+label and the accuracy of the fix it came from. Move one on the map when the GPS
+put it in the wrong place, and save them all as GPX, KML or GeoJSON. Border
+width, position quality, sound and screen behaviour are set in Settings.
 
 Live at <https://marchstone.tinkered.app>. It runs in the phone's browser, needs no
 account, and once loaded works with no signal.
