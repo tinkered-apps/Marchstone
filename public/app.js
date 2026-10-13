@@ -2808,6 +2808,8 @@ if (location.hash === '#settings') {
 } else {
   show('fields');
 }
+// The list and its text are in place: let the first screen show (see .ledger-col in app.css).
+document.documentElement.dataset.ready = '';
 
 // A toast would be gone in six seconds, and this one decides whether the
 // positions you are about to trust are any good. Say it properly, once.

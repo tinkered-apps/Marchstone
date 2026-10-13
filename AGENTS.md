@@ -111,6 +111,11 @@ The footer credit "Marchstone vX.XX by Kuba · tinkered.app · Privacy" links Ku
   or `data-i18n-aria` (label). Counts go through `pl()` for Polish plurals, never a trailing "s".
   In `app.js` the translator is imported as `tr`, because `t` there is the tracking session.
   The language is `lang` in `fb.settings`, default English, and the privacy page reads it too.
+- **The first screen waits for `app.js`.** The list of areas is drawn by script, above the
+  buttons. `.ledger-col` stays `visibility: hidden` until the start-up code sets `data-ready` on
+  `<html>`, so nothing is shown and then pushed down (that was a layout shift of 0.34 on a slow
+  phone). A CSS animation shows the column after 3 s if the script never runs. `npm run test:e2e`
+  measures the shift under slow-4G and CPU throttling.
 - **Green, amber and red belong to the answer.** No button, icon, accent or focus ring may use
   them.
 - **The screen always shows the live fix.** Colour, word and distance never disagree.

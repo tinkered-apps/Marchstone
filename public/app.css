@@ -411,6 +411,13 @@ main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 /* The ledger fills at least the screen, so a short list still leaves the
    footer at the foot of the window rather than halfway up it. */
 .ledger-col { display: flex; flex-direction: column; min-height: 100%; }
+/* app.js draws the list of areas above the buttons. Shown before that, the
+   buttons sat at the top and then dropped 300px when the list arrived. So the
+   column stays invisible until app.js sets data-ready on <html>. The animation
+   is the fallback: if the script never runs, the column appears after 3s. */
+.ledger-col { visibility: hidden; animation: ledger-show 0s 3s forwards; }
+html[data-ready] .ledger-col { visibility: visible; animation: none; }
+@keyframes ledger-show { to { visibility: visible; } }
 .ledger-col > * { flex-shrink: 0; }
 
 .main-footer {

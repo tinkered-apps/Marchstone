@@ -283,6 +283,28 @@ test('a backup holds every area and restores in a fresh browser', async ({ page,
   await fresh.close();
 });
 
+test('the first screen does not jump while it loads on a slow phone', async ({ page, context }) => {
+  // The conditions Lighthouse uses for its mobile run: slow 4G and a CPU four times slower.
+  // On a fast machine the script finishes before the first paint and hides the problem.
+  const cdp = await context.newCDPSession(page);
+  await cdp.send('Network.enable');
+  await cdp.send('Network.emulateNetworkConditions',
+    { offline: false, latency: 150, downloadThroughput: 1.6 * 1024 * 1024 / 8, uploadThroughput: 750 * 1024 / 8 });
+  await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
+  await page.addInitScript(() => {
+    window.layoutShift = 0;
+    new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) if (!entry.hadRecentInput) window.layoutShift += entry.value;
+    }).observe({ type: 'layout-shift', buffered: true });
+  });
+
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Draw a new area' })).toBeVisible();
+  await page.waitForTimeout(3000);
+  // 0.1 is the limit of a "good" Cumulative Layout Shift.
+  expect(await page.evaluate(() => window.layoutShift)).toBeLessThan(0.1);
+});
+
 test('the home page carries a link preview with a large image', async ({ page, request }) => {
   await page.goto('/');
   const meta = (name) => page.locator(`meta[property="${name}"], meta[name="${name}"]`);
