@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/social-card.png" alt="The Marchstone name next to an area outlined on a map, with a green panel reading: inside, 10 m." width="760">
+</p>
+
 # Marchstone
 
 A marchstone is the stone that says where one holding ends and the next begins.
@@ -216,7 +220,8 @@ on it.
 
 - Author: Kuba (kuba@tinkered.app)
 - Map: [Leaflet](https://leafletjs.com), BSD 2-Clause licence, in
-  [public/vendor/LICENSE-leaflet.txt](public/vendor/LICENSE-leaflet.txt)
+  [public/vendor/LICENSE-leaflet.txt](public/vendor/LICENSE-leaflet.txt); version and source in
+  [public/vendor/NOTICE.md](public/vendor/NOTICE.md)
 - Fonts: Barlow and Barlow Condensed, SIL Open Font License 1.1, in
   [public/vendor/fonts/OFL.txt](public/vendor/fonts/OFL.txt)
 - Imagery: Esri World Imagery (Esri, Maxar, Earthstar Geographics and the GIS User

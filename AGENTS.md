@@ -19,9 +19,10 @@ On Windows, `start.cmd` runs `npm start` and opens the browser. Geolocation work
 modules and the service worker needs a real origin.
 
 `npm run deploy` publishes `public/` to <https://marchstone.tinkered.app> as the `marchstone`
-Worker (static assets only). It is the only deploy path until the repository is connected to
-Workers Builds. Playwright is not part of the deploy gate; run `npm run test:e2e` before
-deploying UI changes.
+Worker (static assets only). Workers Builds (Worker settings, Builds) runs it on every push to
+`main`, with an empty build command; other branches run `npm test` only. Playwright is not part
+of the deploy gate, because the Workers Builds image cannot start Chromium; run
+`npm run test:e2e` before pushing any change to what the browser receives.
 
 `allowScripts` in `package.json` pins the `esbuild` and `workerd` versions whose install scripts
 npm may run. Update it when a Wrangler upgrade changes those versions.
@@ -57,7 +58,8 @@ Everything served lives in `public/`; nothing outside it is uploaded.
 | `_headers` | Security headers for every response |
 
 Leaflet and both Barlow families are vendored in `public/vendor/`, so a phone with no signal
-still gets the real interface.
+still gets the real interface. `npm audit` cannot see them: `public/vendor/NOTICE.md` records
+Leaflet's version and source, and changes with it.
 
 ## Privacy and third parties
 
