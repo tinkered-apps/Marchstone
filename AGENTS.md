@@ -6,10 +6,10 @@ commands and conventions.
 ## Commands
 
 ```bash
-npm install                       # dev dependencies only (wrangler, @playwright/test, @axe-core/playwright)
+npm install                       # dev dependencies only (wrangler, @playwright/test, @axe-core/playwright, eslint)
 npx playwright install chromium   # once, before the first e2e run
 npm start                         # wrangler dev on http://localhost:8123, with production headers
-npm test                          # unit tests: geometry, tracking, marks and files, version, pages
+npm test                          # ESLint (eslint.config.mjs), then unit tests: geometry, tracking, marks and files, version, pages
 npm run test:e2e                  # Playwright, desktop and mobile, against npm start; includes an axe scan in both themes
 npm run deploy                    # npm test, then wrangler deploy
 ```

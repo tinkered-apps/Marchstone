@@ -12,13 +12,16 @@
   },
   "scripts": {
     "start": "wrangler dev --port 8123",
-    "test": "node test/geo.test.mjs && node test/track.test.mjs && node test/marks.test.mjs && node test/i18n.test.mjs && node test/version.test.mjs && node test/pages.test.mjs",
+    "test": "eslint . && node test/geo.test.mjs && node test/track.test.mjs && node test/marks.test.mjs && node test/i18n.test.mjs && node test/version.test.mjs && node test/pages.test.mjs",
     "test:e2e": "playwright test",
     "deploy": "npm test && wrangler deploy"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
     "@playwright/test": "1.63.0",
+    "eslint": "10.12.0",
+    "globals": "17.13.0",
     "wrangler": "4.149.0"
   },
   "allowScripts": {
