@@ -1,0 +1,241 @@
+<!doctype html>
+<!-- Data and privacy note (GDPR Art. 13), in English and Polish. The fixed sections (who is
+     responsible, what the host records, email, rights, the network error reporting row) come from
+     the shared tinkered.app template and publisher profile; keep their wording in both languages.
+     Update the map section and the storage list, in both articles, when the app contacts a new
+     service or stores something new. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#E4E4DE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)">
+<title>Data and privacy · Marchstone</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./app.css">
+<script src="./privacy.js"></script>
+</head>
+<body class="privacy-page">
+<svg class="sprite" aria-hidden="true" focusable="false"><defs>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 4 7 12l8 8"/></symbol>
+  <symbol id="i-tune" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/><circle cx="8" cy="7" r="2.4"/><circle cx="16" cy="12" r="2.4"/><circle cx="7" cy="17" r="2.4"/></symbol>
+  <symbol id="i-theme-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><path class="fill" d="M12 3.5a8.5 8.5 0 0 1 0 17Z"/></symbol>
+  <symbol id="i-theme-light" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1m10.6 10.6 2.1 2.1m0-14.8-2.1 2.1M6.7 17.3l-2.1 2.1"/></symbol>
+  <symbol id="i-theme-dark" viewBox="0 0 24 24"><path d="M20.5 14.8A8.7 8.7 0 0 1 9.2 3.5 8.7 8.7 0 1 0 20.5 14.8Z"/></symbol>
+</defs></svg>
+
+<header id="topbar">
+  <a id="lnkBack" class="icon-btn" href="index.html" aria-label="My areas">
+    <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>
+  </a>
+  <h1 id="title">Privacy</h1>
+  <a id="btnSettings" class="icon-btn" href="index.html#settings" aria-label="Settings">
+    <svg class="icon" aria-hidden="true"><use href="#i-tune"/></svg><span class="icon-word">Settings</span>
+  </a>
+  <div id="langSwitch" class="lang-switch" role="radiogroup" aria-label="Language">
+    <button type="button" role="radio" data-lang="en" lang="en" aria-label="English" aria-checked="true">EN</button>
+    <button type="button" role="radio" data-lang="pl" lang="pl" aria-label="Polski" aria-checked="false">PL</button>
+  </div>
+  <button id="btnTheme" class="icon-btn" type="button" aria-label="Theme: follows your system" title="Theme: follows your system">
+    <svg class="icon" aria-hidden="true"><use href="#i-theme-auto"/></svg>
+  </button>
+</header>
+
+<main class="scroll privacy">
+  <article class="privacy-col" data-locale="en">
+    <section class="pref">
+      <h2>Data and privacy</h2>
+      <p class="pref-note">Marchstone runs in your browser. Your areas, marks and positions
+        stay on your phone and are never sent to me: there are no accounts, forms, analytics,
+        ads or third-party scripts. Two things do reach other servers: the page itself, from
+        the host, and the map, from Esri or OpenStreetMap.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Who is responsible</h2>
+      <p class="pref-note">Kuba, <a href="mailto:kuba@tinkered.app">kuba@tinkered.app</a>.
+        Marchstone is a private, non-commercial hobby project.</p>
+    </section>
+
+    <section class="pref">
+      <h2>What the host records</h2>
+      <p class="pref-note">The site is hosted by Cloudflare. Like any web host, Cloudflare processes your IP address, the time of the request, the page requested and your browser details to deliver the site and protect it from attacks. If a connection to the site fails, your browser may also send Cloudflare a short error report.</p>
+      <p class="pref-note">I can see a sample of these requests, including IP addresses, in the Cloudflare dashboard. I use it only to keep the site working and secure (legitimate interest, Art. 6(1)(f) GDPR). Cloudflare keeps these records for up to 7 days (security events: 24 hours) and then deletes them.</p>
+      <p class="pref-note">Cloudflare, Inc. is based in the United States and processes this data on my behalf under its data processing addendum. Transfers rely on the EU–US Data Privacy Framework, with standard contractual clauses as a fallback. <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Cloudflare's privacy policy</a>.</p>
+    </section>
+
+    <section class="pref">
+      <h2>The map</h2>
+      <p class="pref-note">To draw the map, your browser asks for the squares of ground in
+        view: satellite imagery from Esri, or the street map from the OpenStreetMap Foundation
+        when you switch to it. The provider receives your IP address and which squares you asked
+        for, which is often roughly where you are standing. The OpenStreetMap request also carries
+        this site's address, because its usage policy asks for it; Esri gets no referrer.</p>
+      <p class="pref-note">The map loads only when a map screen opens, or on a wide screen, beside
+        your saved areas. Save the map for offline use, or work on a saved area with no
+        signal, and no tile requests are made. I receive none of this data. The legal basis is
+        legitimate interest in showing you the map the app is built around (Art. 6(1)(f) GDPR).</p>
+      <p class="pref-note">Each provider handles the requests as its own controller, under its own
+        policy: <a href="https://www.esri.com/en-us/privacy/privacy-statements/privacy-statement" rel="noopener">Esri</a>
+        (Environmental Systems Research Institute, Inc., United States, certified under the EU–US
+        Data Privacy Framework) and <a href="https://osmfoundation.org/wiki/Privacy_Policy" rel="noopener">OpenStreetMap
+        Foundation</a> (United Kingdom, which the European Commission recognises as providing
+        adequate protection).</p>
+    </section>
+
+    <section class="pref">
+      <h2>If you email me</h2>
+      <p class="pref-note">Mail to kuba@tinkered.app is forwarded by Cloudflare Email Routing to my Gmail inbox (Google). I use your address and message only to reply (legitimate interest, Art. 6(1)(f) GDPR) and keep the conversation while it may still be useful for follow-up. Ask me to delete it at any time and I will. Google LLC, like Cloudflare, is certified under the EU–US Data Privacy Framework.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Your rights</h2>
+      <p class="pref-note">You can ask for access to your data, its correction or deletion, restriction of processing, or object to processing, by writing to kuba@tinkered.app. You can also complain to your data protection authority; in Poland that is the President of the Personal Data Protection Office (UODO).</p>
+      <p class="pref-note">The hosting records are not tied to names and expire within 7 days. To check whether any of them concern you, send your IP address and the time of your visit within that period.</p>
+    </section>
+
+    <section class="pref">
+      <h2>What the app stores in your browser</h2>
+      <p class="pref-note">These items stay on your device and are not sent to me.</p>
+      <dl class="store-list privacy-store">
+        <div>
+          <dt><code>fb.fields</code></dt>
+          <dd>localStorage. Your areas and the marks on them. Kept until you delete them.</dd>
+        </div>
+        <div>
+          <dt><code>fb.settings</code></dt>
+          <dd>localStorage. Border width, position quality, screen, sound, theme and language.
+            Kept until you clear this site's data.</dd>
+        </div>
+        <div>
+          <dt><code>fb.gaugeSeen</code>, <code>fb.browserSeen</code></dt>
+          <dd>localStorage. A note that the gauge explanation and the browser warning were
+            shown, so neither appears twice. Kept until you clear this site's data.</dd>
+        </div>
+        <div>
+          <dt><code>marchstone-v</code> + version</dt>
+          <dd>Browser cache and service worker. The app's own files, so it opens with no signal.
+            Replaced with each new version.</dd>
+        </div>
+        <div>
+          <dt><code>fb-tiles-v1</code></dt>
+          <dd>Browser cache. Map imagery you viewed or saved, up to 6,000 squares, oldest dropped
+            first. Kept until you use <b>Clear saved map tiles</b> in Settings.</dd>
+        </div>
+        <div>
+          <dt>Network error reporting policy (Cloudflare)</dt>
+          <dd>Browser network setting. Tells the browser where to send a report if a connection
+            to the site fails. Kept for 7 days.</dd>
+        </div>
+      </dl>
+      <p class="pref-note">Remove them at any time in your browser's site settings, or by
+        uninstalling the app. Back up your areas first: they exist nowhere else.</p>
+      <p class="pref-note">No analytics, advertising or profiling.</p>
+    </section>
+
+    <p class="privacy-updated">Last updated: 27 September 2026</p>
+  </article>
+
+  <article class="privacy-col" data-locale="pl" lang="pl" hidden>
+    <section class="pref">
+      <h2>Dane i prywatność</h2>
+      <p class="pref-note">Marchstone działa w przeglądarce. Twoje obszary, znaczniki i pozycje
+        zostają w telefonie i nie trafiają do mnie: nie ma kont, formularzy, analityki, reklam ani
+        skryptów firm trzecich. Z serwerami łączą się tylko dwie rzeczy: strona pobiera się
+        z hostingu, a mapa z Esri lub OpenStreetMap.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Kto odpowiada za dane</h2>
+      <p class="pref-note">Kuba, <a href="mailto:kuba@tinkered.app">kuba@tinkered.app</a>.
+        Marchstone to prywatny, niekomercyjny projekt hobbystyczny.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Co zapisuje hosting</h2>
+      <p class="pref-note">Stronę hostuje Cloudflare. Jak każdy hosting, Cloudflare przetwarza adres IP, czas żądania, adres strony i dane przeglądarki, żeby dostarczyć stronę i chronić ją przed atakami. Gdy połączenie ze stroną się nie powiedzie, przeglądarka może też wysłać do Cloudflare krótki raport o błędzie.</p>
+      <p class="pref-note">Próbkę tych żądań, z adresami IP, widzę w panelu Cloudflare. Korzystam z niej wyłącznie w celu utrzymania działania i bezpieczeństwa strony (prawnie uzasadniony interes, art. 6 ust. 1 lit. f RODO). Cloudflare przechowuje te zapisy do 7 dni (zdarzenia bezpieczeństwa: 24 godziny), po czym je usuwa.</p>
+      <p class="pref-note">Cloudflare, Inc. ma siedzibę w USA i przetwarza te dane w moim imieniu na podstawie umowy powierzenia. Transfer opiera się na ramach ochrony danych UE–USA (Data Privacy Framework), a pomocniczo na standardowych klauzulach umownych. <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener">Polityka prywatności Cloudflare</a>.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Mapa</h2>
+      <p class="pref-note">Żeby wyświetlić mapę, przeglądarka pobiera fragmenty terenu, które są
+        na ekranie: zdjęcia satelitarne od Esri, a po przełączeniu mapę ulic od OpenStreetMap
+        Foundation. Dostawca widzi Twój adres IP i to, jakie fragmenty pobierasz, czyli zwykle
+        w przybliżeniu miejsce, w którym jesteś. Do OpenStreetMap trafia też adres tej strony,
+        bo wymagają tego jego zasady. Esri go nie dostaje.</p>
+      <p class="pref-note">Mapa ładuje się dopiero po otwarciu ekranu z mapą, a na szerokim ekranie
+        także obok listy obszarów. Jeśli mapa jest pobrana albo pracujesz na zapisanym obszarze bez
+        zasięgu, aplikacja nie łączy się z serwerami map. Ja nie dostaję żadnych z tych danych.
+        Podstawą prawną jest prawnie uzasadniony interes, czyli wyświetlenie mapy, bez której
+        aplikacja nie działa (art. 6 ust. 1 lit. f RODO).</p>
+      <p class="pref-note">Każdy dostawca jest osobnym administratorem tych danych i przetwarza je
+        według własnych zasad: <a href="https://www.esri.com/en-us/privacy/privacy-statements/privacy-statement" rel="noopener">Esri</a>
+        (Environmental Systems Research Institute, Inc., USA, certyfikacja w ramach ochrony danych
+        UE–USA, Data Privacy Framework) oraz <a href="https://osmfoundation.org/wiki/Privacy_Policy" rel="noopener">OpenStreetMap
+        Foundation</a> (Wielka Brytania, dla której Komisja Europejska stwierdziła odpowiedni
+        poziom ochrony danych).</p>
+    </section>
+
+    <section class="pref">
+      <h2>Jeśli do mnie napiszesz</h2>
+      <p class="pref-note">Poczta na kuba@tinkered.app jest przekazywana przez Cloudflare Email Routing do mojej skrzynki Gmail (Google). Twój adres i treść wiadomości wykorzystuję wyłącznie do odpowiedzi (prawnie uzasadniony interes, art. 6 ust. 1 lit. f RODO) i przechowuję korespondencję, dopóki może być potrzebna do dalszego kontaktu. Na Twoją prośbę usunę ją w każdej chwili. Google LLC, tak jak Cloudflare, ma certyfikację w ramach ochrony danych UE–USA (Data Privacy Framework).</p>
+    </section>
+
+    <section class="pref">
+      <h2>Twoje prawa</h2>
+      <p class="pref-note">Możesz zażądać dostępu do danych, ich sprostowania lub usunięcia, ograniczenia przetwarzania albo wnieść sprzeciw, pisząc na kuba@tinkered.app. Przysługuje Ci też skarga do Prezesa Urzędu Ochrony Danych Osobowych.</p>
+      <p class="pref-note">Zapisy hostingu nie są przypisane do osób i wygasają w ciągu 7 dni. Żeby sprawdzić, czy któryś Cię dotyczy, podaj adres IP i czas wizyty z tego okresu.</p>
+    </section>
+
+    <section class="pref">
+      <h2>Co aplikacja zapisuje w przeglądarce</h2>
+      <p class="pref-note">Te dane zostają w Twoim telefonie i nie trafiają do mnie.</p>
+      <dl class="store-list privacy-store">
+        <div>
+          <dt><code>fb.fields</code></dt>
+          <dd>Pamięć lokalna. Twoje obszary i znaczniki, dopóki ich nie usuniesz.</dd>
+        </div>
+        <div>
+          <dt><code>fb.settings</code></dt>
+          <dd>Pamięć lokalna. Szerokość pasa granicy, jakość pozycji, ekran, dźwięk, motyw
+            i język, dopóki nie wyczyścisz danych strony.</dd>
+        </div>
+        <div>
+          <dt><code>fb.gaugeSeen</code>, <code>fb.browserSeen</code></dt>
+          <dd>Pamięć lokalna. Czy pokazano już wyjaśnienie wskaźnika i uwagę o przeglądarce,
+            żeby nie wyświetlać ich drugi raz. Do wyczyszczenia danych strony.</dd>
+        </div>
+        <div>
+          <dt><code>marchstone-v</code> + wersja</dt>
+          <dd>Pamięć podręczna przeglądarki i service worker. Pliki aplikacji, żeby działała
+            bez zasięgu. Wymieniane z każdą nową wersją.</dd>
+        </div>
+        <div>
+          <dt><code>fb-tiles-v1</code></dt>
+          <dd>Pamięć podręczna przeglądarki. Wyświetlone i pobrane fragmenty mapy, do 6000.
+            Gdy jest ich więcej, najstarsze są usuwane. Zostają, dopóki nie użyjesz przycisku
+            <b>Usuń pobrane mapy</b> w Ustawieniach.</dd>
+        </div>
+        <div>
+          <dt>Polityka raportowania błędów sieci (Cloudflare)</dt>
+          <dd>Ustawienie sieciowe przeglądarki. Wskazuje przeglądarce, dokąd wysłać raport, gdy
+            połączenie ze stroną się nie powiedzie. Przechowywane 7 dni.</dd>
+        </div>
+      </dl>
+      <p class="pref-note">Usuniesz je w każdej chwili w ustawieniach witryny w przeglądarce
+        albo odinstalowując aplikację. Najpierw zapisz kopię obszarów, bo nie ma ich nigdzie
+        indziej.</p>
+      <p class="pref-note">Bez analityki, reklam i profilowania.</p>
+    </section>
+
+    <p class="privacy-updated">Ostatnia aktualizacja: 27 września 2026</p>
+  </article>
+</main>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "id": "./",
+  "name": "Marchstone: Bounds & Marks",
+  "short_name": "Marchstone",
+  "description": "Mark an area on a map and get warned by colour, sound and vibration when you reach or cross its edge. Drop numbered waypoints as you walk it. Works offline, no account.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#E4E4DE",
+  "theme_color": "#E4E4DE",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "screenshots": [
+    { "src": "./screenshot-areas.png", "sizes": "824x1830", "type": "image/png",
+      "form_factor": "narrow", "label": "Your saved areas, each ready to track" },
+    { "src": "./screenshot-tracking.jpg", "sizes": "824x1830", "type": "image/jpeg",
+      "form_factor": "narrow", "label": "Tracking an area: inside, 10 m in from the edge" }
+  ]
+}

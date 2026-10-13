@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#E4E4DE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#101215" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Marchstone">
+<title>Marchstone: Bounds &amp; Marks</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="preload" href="./vendor/fonts/barlowcond-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./vendor/fonts/barlow-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./vendor/leaflet.css">
+<link rel="stylesheet" href="./fonts.css">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true" focusable="false"><defs>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 4 7 12l8 8"/></symbol>
+  <symbol id="i-tune" viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/><circle cx="8" cy="7" r="2.4"/><circle cx="16" cy="12" r="2.4"/><circle cx="7" cy="17" r="2.4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></symbol>
+  <symbol id="i-plan" viewBox="0 0 24 24"><path d="M12 3.5 20.5 9.6 17.2 20H6.8L3.5 9.6Z"/><path d="M12 1.9v3.2M20.5 8v3.2M17.2 18.4v3.2M6.8 18.4v3.2M3.5 8v3.2"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M13 3H6v18h12V8Z"/><path d="M13 3v5h5"/><path d="M12 11v6m-2.6-2.6L12 17l2.6-2.6"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M4 9h10a5 5 0 0 1 0 10H8"/><path d="M8 5 4 9l4 4"/></symbol>
+  <symbol id="i-clear" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 10.5v6M14 10.5v6"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5.6"/><circle cx="12" cy="12" r="1.5" class="fill"/><path d="M12 1.6v3.6M12 18.8v3.6M1.6 12h3.6M18.8 12h3.6"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3.2 21.4 8.6 12 14 2.6 8.6Z"/><path d="M2.6 13.4 12 18.8l9.4-5.4"/></symbol>
+  <symbol id="i-offline" viewBox="0 0 24 24"><path d="M12 3v11m-3.6-3.6L12 14l3.6-3.6"/><path d="M4 18h16"/><path d="M4 18v3h16v-3"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5v14L7.5 14.5H4Z"/><path d="M15.5 9a4.4 4.4 0 0 1 0 6M18.4 6.2a8.4 8.4 0 0 1 0 11.6"/></symbol>
+  <symbol id="i-sound-off" viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5v14L7.5 14.5H4Z"/><path d="m15.5 9.5 5 5m0-5-5 5"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20v-4L16 4l4 4L8 20Z"/><path d="m14 6 4 4"/></symbol>
+  <symbol id="i-rename" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M9 20h6"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 16V4m-3.6 3.6L12 4l3.6 3.6"/><path d="M4 14v6h16v-6"/></symbol>
+  <symbol id="i-move" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.6v4.4M12 17v4.4M2.6 12H7M17 12h4.4"/><path d="m9.4 5.2 2.6-2.6 2.6 2.6M9.4 18.8l2.6 2.6 2.6-2.6M5.2 9.4 2.6 12l2.6 2.6M18.8 9.4 21.4 12l-2.6 2.6"/></symbol>
+  <symbol id="i-walk" viewBox="0 0 24 24"><circle cx="13.2" cy="4.3" r="2.3"/><path d="M13.2 7.3 11.4 13.4"/><path d="m11.4 13.4 3 3.4.8 4.6"/><path d="m11.4 13.4-2.8 3.4-.8 4.6"/><path d="M12.5 9.4 16 11.5M12.5 9.4 9.1 11.9"/></symbol>
+  <symbol id="i-mark" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4.3"/><path d="M12 11.3V20"/><path d="M4.5 20h15"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 3.5 22 20.5H2Z"/><path d="M12 10v5"/><circle cx="12" cy="17.8" r="1.1" class="fill"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m4 12.5 5.5 5.5L20 6.5"/></symbol>
+  <symbol id="i-theme-auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v17"/><path class="fill" d="M12 3.5a8.5 8.5 0 0 1 0 17Z"/></symbol>
+  <symbol id="i-theme-light" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1m10.6 10.6 2.1 2.1m0-14.8-2.1 2.1M6.7 17.3l-2.1 2.1"/></symbol>
+  <symbol id="i-theme-dark" viewBox="0 0 24 24"><path d="M20.5 14.8A8.7 8.7 0 0 1 9.2 3.5 8.7 8.7 0 1 0 20.5 14.8Z"/></symbol>
+</defs></svg>
+
+<header id="topbar">
+  <button id="btnBack" class="icon-btn" aria-label="Back" data-i18n-aria="common.back">
+    <svg class="icon" aria-hidden="true"><use href="#i-back"/></svg>
+  </button>
+  <!-- The name of the thing, on screens wide enough to spare it the room. -->
+  <span class="brand" aria-hidden="true">
+    <svg viewBox="0 0 512 512"><polygon points="150,168 372,140 392,332 256,398 128,306"/><circle cx="258" cy="268" r="34"/></svg>Marchstone
+  </span>
+  <h1 id="title">My areas</h1>
+  <button id="btnMarks" class="icon-btn" aria-label="Marks" hidden>
+    <svg class="icon" aria-hidden="true"><use href="#i-mark"/></svg><span id="markCount">0</span>
+  </button>
+  <button id="btnSettings" class="icon-btn" aria-label="Settings" data-i18n-aria="title.settings">
+    <svg class="icon" aria-hidden="true"><use href="#i-tune"/></svg><span class="icon-word" data-i18n="title.settings">Settings</span>
+  </button>
+  <!-- Each language named in itself, so the one you can read is findable
+       whichever is on. -->
+  <div id="langSwitch" class="lang-switch" role="radiogroup" aria-label="Language" data-i18n-aria="lang.label">
+    <button type="button" role="radio" data-lang="en" lang="en" aria-label="English" aria-checked="true">EN</button>
+    <button type="button" role="radio" data-lang="pl" lang="pl" aria-label="Polski" aria-checked="false">PL</button>
+  </div>
+  <button id="btnTheme" class="icon-btn" type="button" aria-label="Theme: follows your system" title="Theme: follows your system">
+    <svg class="icon" aria-hidden="true"><use href="#i-theme-auto"/></svg>
+  </button>
+</header>
+
+<!-- One landmark around the three screens. Only ever one of them is not
+     hidden, so "main" always names exactly what is on the glass. -->
+<main>
+
+<!-- ============================ the ledger of saved areas ============ -->
+<section id="scrFields" class="screen scroll" aria-label="Saved areas" data-i18n-aria="aria.savedAreas">
+  <div class="ledger-col">
+    <!-- The sheet's title block: what is on it, in the same labelled figures as
+         every row under it. Up only once there is something to count. -->
+    <dl id="fieldTally" class="tally" hidden></dl>
+
+    <div id="fieldList" class="ledger"></div>
+
+    <div class="actions">
+      <button id="btnDraw" class="btn btn-filled">
+        <svg class="icon" aria-hidden="true"><use href="#i-plan"/></svg><span data-i18n="fields.draw">Draw a new area</span>
+      </button>
+      <button id="btnImport" class="btn">
+        <svg class="icon" aria-hidden="true"><use href="#i-import"/></svg><span data-i18n="fields.import">Import a boundary file</span>
+      </button>
+      <input type="file" id="fileInput" hidden
+             accept=".kml,.gpx,.geojson,.json,application/geo+json,application/vnd.google-earth.kml+xml">
+    </div>
+
+    <!-- A drawing's key: the three ways an area gets onto the sheet, each with
+         the symbol its tool carries on the drawing screen. -->
+    <div class="note">
+      <ul class="ways">
+        <li><svg class="icon" aria-hidden="true"><use href="#i-plan"/></svg>
+          <p data-i18n-html="ways.draw"><b>Draw:</b> tap each corner of the area on a satellite map.</p></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-walk"/></svg>
+          <p data-i18n-html="ways.walk"><b>Walk:</b> or go round it on foot and drop a corner where you stand.</p></li>
+        <li><svg class="icon" aria-hidden="true"><use href="#i-import"/></svg>
+          <p data-i18n-html="ways.import"><b>Import:</b> KML, GPX or GeoJSON, from Google Earth, a handheld GPS or
+            farm software.</p></li>
+      </ul>
+      <p class="ways-then" data-i18n-html="ways.then">Then <b>Track</b>, and the phone tells you whether you are
+        in, out, or on the edge.</p>
+    </div>
+
+    <footer class="main-footer" aria-label="About Marchstone" data-i18n-aria="footer.about">
+      <p class="footer-credit">Marchstone <span id="footerVersion">&ndash;</span> <span data-i18n="footer.by">by</span> <a href="mailto:kuba@tinkered.app">Kuba</a> · <a href="https://tinkered.app"><svg class="footer-logo" viewBox="79 180 1260 842" aria-hidden="true" focusable="false"><path class="footer-logo-t" fill-rule="evenodd" d="m 729.04769,199.78241 -621.00001,-1 -15.999996,3 -11,5 -13,9 -13,17 -5,13 -2,17.99999 1,68 3,11 7,12 15,14 20,7 H 277.04769 l 5,2 8,10 1,553 6,13 220.42051,-334.04584 -13.42051,-0.95416 -12,-6 -8,-8 -5,-12 -1,-200 2,-7 6,-7 7,-3 h 114 l 11,-4 6,-5 68,-103 38,-53.99999 1,-8 z"/><path class="footer-logo-a" fill-rule="evenodd" d="m 690.04769,623.7824 -5,-4 h -168 l -198,298 -24,34 5,9 12,11 9,4 10,2 h 200 l 15,-3 12,-6 6,-5 13,-17 157,-239 v -7 z m 95,-69 -7,9 -36,59 v 6 l 40,68 5,2 h 76 l 4,-2 41,-68 v -5 l -28,-50 -10,-17 -5,-3 z m 2,-352.99999 -15,17 -218,336.99999 -11,20 166,-1 7,-5 35,-57 8,-7 137,-1 7,3 7,8 57,103 1,9 -4,10 -66,103 -9,4 -124,1 -7,5 -33,51 -6,14 3,3 h 197 l 8,3 8,8 70.00001,125 12,13 15.9999,8 10,2 h 199 l 23,-8 15,-15 7,-16 1,-16 -4,-16 -357.99991,-675.99999 -17,-19 -11,-7 -15,-5 -87,-1 z"/></svg>tinkered.app</a> · <a href="privacy.html" data-i18n="footer.privacy">Privacy</a></p>
+    </footer>
+  </div>
+
+  <!-- Wide screens only: every area on the ground at once, beside the ledger.
+       A phone has no room for it and gets the ledger alone. -->
+  <div id="overview" class="overview" role="region" aria-label="Map of your areas" data-i18n-aria="aria.overview" hidden></div>
+</section>
+
+<!-- ============================ map: drawing and tracking ============ -->
+<section id="scrMap" class="screen" hidden>
+  <div id="map"></div>
+
+  <!-- live measurements while drawing -->
+  <div id="editReadout" class="readout" hidden>
+    <div class="readout-row">
+      <div class="cell"><span class="label" data-i18n="ro.corners">Corners</span><span class="value" id="roPoints">0</span></div>
+      <div class="cell"><span class="label" data-i18n="ro.area">Area</span><span class="value" id="roArea">–</span></div>
+      <div class="cell"><span class="label" data-i18n="ro.edge">Edge</span><span class="value" id="roEdge">–</span></div>
+    </div>
+    <!-- Only while the boundary is being walked: the two numbers that decide
+         whether the corner under your feet is worth dropping. Same pair, same
+         order, as the readout strip on the tracking screen. -->
+    <div class="readout-row" id="roWalk" hidden>
+      <div class="cell"><span class="label">GPS</span><span class="value" id="roAcc">–</span></div>
+      <div class="cell"><span class="label" data-i18n="ro.lastFix">Last fix</span><span class="value" id="roAge">–</span></div>
+    </div>
+    <p class="readout-hint" id="roHint">Tap the map to drop the first corner, or walk them out on foot</p>
+  </div>
+
+  <div id="accWarn" class="warn" role="status" hidden>
+    <svg class="icon" aria-hidden="true"><use href="#i-warning"/></svg>
+    <span id="accWarnText"></span>
+  </div>
+
+  <!-- While a mark is being moved by hand. It says which mark and how far the
+       hand has taken it from where the fix put it, because that figure is what
+       catches a disc dragged onto the wrong tree. -->
+  <div id="moveBar" class="move-bar" role="group" aria-label="Moving a mark" data-i18n-aria="aria.moving" hidden>
+    <p class="move-text" id="moveText"></p>
+    <div class="move-acts">
+      <button id="btnMoveCancel" class="btn" data-i18n="move.cancel">Leave it</button>
+      <button id="btnMovePlace" class="btn btn-filled" data-i18n="move.place">Place it here</button>
+    </div>
+  </div>
+
+  <!-- The keys stack up from the bottom right corner, where a thumb finds them
+       without looking: MARK always, the last mark's options above it once
+       there is one, FOLLOW on top when the map has stopped following you.
+       They are one column so that a key going away closes the gap it left. -->
+  <div class="map-keys">
+    <!-- Only here once you have pushed the map away from yourself. The map
+         stops chasing you the moment you drag it, so this is how you say you
+         are done looking around. -->
+    <button id="btnRecentre" class="recentre" hidden>
+      <svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg><span data-i18n="key.follow">Follow</span>
+    </button>
+
+    <!-- The mark you last dropped or opened, one tap away. Not its options
+         spread across the map: the disc and its number, and everything you can
+         do to it is behind the tap. -->
+    <button id="btnLastMark" class="last-key" hidden>
+      <span class="last-disc" id="lastMarkNum" aria-hidden="true">1</span><span data-i18n="key.last">Last</span>
+    </button>
+
+    <!-- Drop a point where you are standing. It lives on the map, not in the
+         panel: the panel is the answer and must not shrink to make room for a
+         control. -->
+    <button id="btnMark" class="mark-key" hidden>
+      <svg class="icon" aria-hidden="true"><use href="#i-mark"/></svg><span data-i18n="key.mark">Mark</span>
+    </button>
+
+    <!-- The drawing screen's twin of MARK, up only while the boundary is being
+         walked. It carries the number it is about to place rather than an
+         icon, so the key and the corner it drops are one object. -->
+    <button id="btnCorner" class="mark-key" hidden>
+      <span class="corner-disc" id="cornerNum" aria-hidden="true">1</span><span data-i18n="key.corner">Corner</span>
+    </button>
+  </div>
+
+  <!-- drawing controls -->
+  <div id="editBar" class="dock" hidden>
+    <div class="tools">
+      <button id="btnUndo" class="tool"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg><span data-i18n="tool.undo">Undo</span></button>
+      <button id="btnClear" class="tool"><svg class="icon" aria-hidden="true"><use href="#i-clear"/></svg><span data-i18n="tool.clear">Clear</span></button>
+      <!-- A mode, not an action, so it is filled while it is on, the way every
+           switch in this app is. -->
+      <button id="btnWalk" class="tool" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-walk"/></svg><span data-i18n="tool.walk">Walk</span></button>
+      <button id="btnLocate" class="tool"><svg class="icon" aria-hidden="true"><use href="#i-locate"/></svg><span data-i18n="tool.locate">Find me</span></button>
+      <button id="btnLayer" class="tool"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><span id="layerName">Satellite</span></button>
+      <button id="btnOffline" class="tool"><svg class="icon" aria-hidden="true"><use href="#i-offline"/></svg><span id="offlineName" data-i18n="tool.saveMap">Save map</span></button>
+    </div>
+    <div class="dock-actions">
+      <button id="btnCancelEdit" class="btn" data-i18n="common.cancel">Cancel</button>
+      <button id="btnSaveEdit" class="btn btn-filled" disabled>
+        <svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span data-i18n="edit.save">Save area</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================= the answer ========================= -->
+  <div id="trackPanel" class="panel" data-status="waiting" hidden>
+    <div class="panel-pulse" aria-hidden="true"></div>
+    <div class="panel-body">
+      <!-- verdict and figure share a line: the panel has to leave the map room -->
+      <div class="verdict-row">
+        <p id="trackStatus" class="verdict" role="status" aria-live="polite">Waiting</p>
+        <p class="figure">
+          <span id="trackNum" class="figure-num">&ndash;&ndash;</span><span
+                id="trackUnit" class="figure-unit">m</span>
+        </p>
+      </div>
+      <p id="trackCaption" class="figure-caption">looking for satellites</p>
+
+      <!-- how close, and which way you are drifting. Every part is named on the
+           face of it: you should never have to work out which end is which. -->
+      <button class="gauge" id="gauge" aria-label="How to read the gauge" data-i18n-aria="gauge.aria">
+        <div class="gauge-you"><span id="gaugeYou" data-i18n="gauge.you">You</span></div>
+        <div class="gauge-track">
+          <div class="gauge-ticks" id="gaugeTicks"></div>
+          <b class="gauge-zone in" data-i18n="status.inside">Inside</b>
+          <b class="gauge-zone out" data-i18n="status.outside">Outside</b>
+          <div class="gauge-band" id="gaugeBand"></div>
+          <div class="gauge-zero"></div>
+          <div class="gauge-mark" id="gaugeMark"></div>
+        </div>
+        <div class="gauge-scale" id="gaugeScale"></div>
+      </button>
+
+      <button id="metaStrip" class="meta" aria-label="GPS detail" data-i18n-aria="meta.aria">
+        <span><b>GPS</b><i id="metaAcc">&ndash;</i></span>
+        <span><b data-i18n="meta.border">Border</b><i id="metaBuffer">&ndash;</i></span>
+        <span><b data-i18n="ro.lastFix">Last fix</b><i id="metaAge">&ndash;</i></span>
+      </button>
+
+      <div class="panel-actions">
+        <button id="btnStop" class="btn btn-onsignal">
+          <svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg><span data-i18n="panel.stop">Stop</span>
+        </button>
+        <button id="btnMute" class="btn btn-onsignal">
+          <svg class="icon" aria-hidden="true"><use href="#i-sound"/></svg><span id="muteName">Mute</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ settings ============================= -->
+<section id="scrSettings" class="screen scroll" hidden aria-label="Settings" data-i18n-aria="title.settings">
+  <!-- One column on a phone, two on a desk. -->
+  <div class="prefs">
+
+  <section class="pref">
+    <h2 data-i18n="set.border">Border width</h2>
+    <output class="pref-figure" id="bufferValue" for="bufferRange">5<span class="unit">m</span></output>
+    <input type="range" id="bufferRange" min="1" max="30" step="1" aria-label="Border width in metres" data-i18n-aria="set.borderAria">
+    <div class="pref-scale"><span>1</span><span>10</span><span>20</span><span>30</span></div>
+    <p class="pref-note" data-i18n-html="set.borderNote">How far either side of the boundary line counts as
+      <i>on the border</i>. Phone GPS is usually good to 3–8 m, so under about 4 m the
+      answer flickers.</p>
+  </section>
+
+  <section class="pref">
+    <h2 data-i18n="set.hear">Hear the warnings</h2>
+    <p class="pref-note" data-i18n="set.hearNote">Try each one now, at the volume you will work at.</p>
+    <div class="signal-tests">
+      <button data-preview="inside" class="sig-test" data-status="inside" data-i18n="status.inside">Inside</button>
+      <button data-preview="unsure" class="sig-test" data-status="unsure" data-i18n="status.unsure">Unsure</button>
+      <button data-preview="border" class="sig-test" data-status="border" data-i18n="status.border">Border</button>
+      <button data-preview="outside" class="sig-test" data-status="outside" data-i18n="status.outside">Outside</button>
+    </div>
+    <p class="pref-note" id="vibNote" data-i18n="set.vibNote" hidden>This phone cannot vibrate from a
+      web page (iPhones never can), so you get colour and sound only. Keep the volume up.</p>
+  </section>
+
+  <section class="pref">
+    <h2 data-i18n="set.quality">Position quality</h2>
+    <div class="segmented" role="radiogroup" aria-label="Ignore vague positions" data-i18n-aria="set.qualityAria">
+      <button data-gate="0" role="radio" aria-checked="false" data-i18n="set.gateOff">Off</button>
+      <button data-gate="50" role="radio" aria-checked="false">50 m</button>
+      <button data-gate="30" role="radio" aria-checked="true">30 m</button>
+      <button data-gate="15" role="radio" aria-checked="false">15 m</button>
+    </div>
+    <p class="pref-note" id="gateNote">&ndash;</p>
+    <p class="pref-note" data-i18n="set.qualityNote1">With no satellite lock, a phone guesses from
+      wifi and masts and still calls it a position. If nothing better arrives for 15 seconds,
+      the app shows what it has and says how rough it is.</p>
+    <p class="pref-note" data-i18n-html="set.qualityNote2">Poor positions everywhere? On Android,
+      give the browser <b>precise</b> location: Settings, Apps, your browser, Permissions,
+      Location. Chrome blends GPS with wifi, cell and motion sensors; Firefox reads raw GPS and
+      wanders more. Track in Chrome where you can.</p>
+  </section>
+
+  <label class="pref pref-switch">
+    <span class="switch-text">
+      <b data-i18n="set.awake">Keep the screen on while tracking</b>
+      <span class="pref-note" data-i18n="set.awakeNote">Warnings are unreliable once the phone sleeps.</span>
+    </span>
+    <input type="checkbox" id="chkAwake" class="switch">
+  </label>
+
+  <label class="pref pref-switch">
+    <span class="switch-text">
+      <b data-i18n="set.muted">Start muted</b>
+      <span class="pref-note" data-i18n="set.mutedNote">Colour only: no sound, no vibration.</span>
+    </span>
+    <input type="checkbox" id="chkMuted" class="switch">
+  </label>
+
+  <section class="pref">
+    <h2 data-i18n="set.areas">Your areas</h2>
+    <p class="pref-note" id="storeInfo">&ndash;</p>
+    <div class="pref-row">
+      <button id="btnBackup" class="btn" data-i18n="set.backup">Back up every area</button>
+      <button id="btnRestore" class="btn" data-i18n="set.restore">Restore from a backup</button>
+    </div>
+    <input type="file" id="restoreInput" accept=".geojson,.json,.kml,.gpx" hidden>
+    <p class="pref-note" data-i18n="set.areasNote">Browser storage is no place for the only copy
+      of anything. A backup is one file holding every area, and any browser, phone or computer
+      can read it back.</p>
+  </section>
+
+  <section class="pref">
+    <h2 data-i18n="set.offline">Offline maps</h2>
+    <p class="pref-note" id="tileInfo">–</p>
+    <button id="btnClearTiles" class="btn" data-i18n="set.clearTiles">Clear saved map tiles</button>
+    <p class="pref-note" data-i18n-html="set.offlineNote">Areas and tracking need no signal. The
+      map picture does, unless you save it first with <b>Save map</b> while drawing.</p>
+  </section>
+
+  </div>
+
+  <p class="colophon" data-i18n-html="set.privacyLink">What stays on this phone, what the map
+    providers receive, and your rights: <a href="privacy.html">Privacy</a>.</p>
+</section>
+
+</main>
+
+<div id="toast" role="status" hidden></div>
+
+<div id="sheet" hidden>
+  <div class="sheet-card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle"></h2>
+    <div id="sheetBody"></div>
+    <button id="sheetClose" class="btn" data-i18n="common.close">Close</button>
+  </div>
+</div>
+
+<script src="./vendor/leaflet.js"></script>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

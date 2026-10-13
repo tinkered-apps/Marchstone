@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# OS / sync clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+~$*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code: local-only settings and throwaway worktrees
+# (.claude/launch.json stays tracked; it just starts the dev server)
+.claude/settings.local.json
+.claude/worktrees/
+
+# Secrets and local environment
+.env
+.env.*
+*.local
+*.pem
+*.key
+
+# Logs and tool output
+*.log
+test-results/
+playwright-report/
+.audyt-prawny/
+npm-debug.log*
+coverage/
+.cache/
+
+# Real field data exported from the app: tracks, marks, boundaries.
+# These carry actual locations; keep them out of a public repo.
+*.gpx
+*.kml
+*.kmz
+*.geojson
+
+# Wrangler: build output, local state and local secrets
+.wrangler/
+.dev.vars
+.dev.vars.*

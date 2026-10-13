@@ -1,0 +1,17 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://server.arcgisonline.com https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://server.arcgisonline.com https://tile.openstreetmap.org; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=(self), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+  Strict-Transport-Security: max-age=31536000
+
+# The worker decides what is fresh, so it must never be served from a stale cache.
+/sw.js
+  Cache-Control: no-cache
+
+# The privacy note is for visitors, not search results.
+/privacy
+  X-Robots-Tag: noindex
+/privacy.html
+  X-Robots-Tag: noindex

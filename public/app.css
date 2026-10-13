@@ -1,0 +1,1853 @@
+/* app.css: Marchstone
+ *
+ * The world is a surveyor's field book: stone paper, black ink, hairline rules,
+ * tick marks, tabular figures. One rule governs everything:
+ *
+ *   GREEN, AMBER AND RED ARE RESERVED FOR THE ANSWER.
+ *
+ * No button, link, icon, focus ring or accent may use them. That is what makes
+ * the tracking panel land as a signal rather than as more interface.
+ */
+
+/* ------------------------------------------------------------- tokens */
+
+:root {
+  /* How far a secondary label may fade on a signal ground before 11px type
+     drops under WCAG AA. Measured on the built panel across all four states in
+     both schemes; the amber and the red are what set it. */
+  --label-quiet: 0.85;
+
+  /* paper and ink */
+  --paper:        #E4E4DE;
+  --paper-raised: #F3F3EF;
+  --paper-sunk:   #DBDBD4;
+  --ink:          #14161A;
+  --ink-2:        #565B60;
+  --ink-3:        #5C6064;
+  --rule:         #C3C4BE;
+  --rule-strong:  #9DA098;
+
+  /* signal, reserved, identical in both schemes */
+  --sig-inside:   #10693A;
+  --sig-border:   #E08A00;
+  --sig-outside:  #C22B1B;
+  --on-inside:    #FFFFFF;
+  --on-border:    #14161A;
+  --on-outside:   #FFFFFF;
+
+  --shadow-dock:  0 -2px 18px rgba(20, 22, 26, 0.16);
+  --shadow-lift:  0 6px 22px rgba(20, 22, 26, 0.22);
+
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+
+  /* an exponential settle, instrument needles, not UI easing */
+  --ease-settle: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper:        #101215;
+    --paper-raised: #1A1D21;
+    --paper-sunk:   #0A0B0D;
+    --ink:          #E9E9E3;
+    --ink-2:        #A0A49F;
+    --ink-3:        #8E928D;
+    --rule:         #2F3338;
+    --rule-strong:  #4A4F55;
+    --shadow-dock:  0 -2px 20px rgba(0, 0, 0, 0.6);
+    --shadow-lift:  0 6px 24px rgba(0, 0, 0, 0.65);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper:        #101215;
+  --paper-raised: #1A1D21;
+  --paper-sunk:   #0A0B0D;
+  --ink:          #E9E9E3;
+  --ink-2:        #A0A49F;
+  --ink-3:        #8E928D;
+  --rule:         #2F3338;
+  --rule-strong:  #4A4F55;
+  --shadow-dock:  0 -2px 20px rgba(0, 0, 0, 0.6);
+  --shadow-lift:  0 6px 24px rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------- base */
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+[hidden] { display: none !important; }
+
+html, body { margin: 0; height: 100%; overscroll-behavior: none; }
+
+body {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 16px/1.5 'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2 { margin: 0; font-weight: 700; }
+
+:where(button, input, [tabindex]):focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+/* The ring is drawn 2px outside the control, so it must contrast with whatever
+   the control is sitting ON, not with the control itself. */
+.panel :focus-visible { outline-color: currentColor; }
+#toast button:focus-visible { outline-color: var(--paper); }
+.warn :focus-visible { outline-color: var(--paper); }
+
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+.icon {
+  width: 24px;
+  height: 24px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+}
+.icon .fill { fill: currentColor; stroke: none; }
+
+/* The instrument label: every number in this app is announced by one. */
+.label, .meta dt, .readout .label, .gauge-heads, .gauge-scale, .pref-scale {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------- topbar */
+
+#topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: max(var(--safe-t), 8px) 6px 8px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+
+#title {
+  flex: 1;
+  min-width: 0;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 25px;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.icon-btn:active { background: var(--paper-sunk); }
+#btnBack[hidden] ~ #title { margin-left: 48px; }
+
+/* EN / PL, drawn as the settings' segmented control at header size. The keys
+   are 32px on the glass and 48px under the thumb. */
+.lang-switch {
+  flex: none;
+  display: flex;
+  margin-inline: 2px 0;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+}
+.lang-switch button {
+  position: relative;
+  min-width: 32px;
+  height: 30px;
+  padding: 0 6px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.lang-switch button + button { border-left: 1.5px solid var(--ink); }
+.lang-switch button::after { content: ""; position: absolute; inset: -9px 0; }
+.lang-switch button[aria-checked="true"] { background: var(--ink); color: var(--paper); }
+
+/* The name of the app, left of the title, once a screen is wide enough that a
+   centred title and a settings key 700px apart stop reading as one bar. */
+.brand { display: none; }
+.icon-word { display: none; }
+#btnSettings[hidden] { visibility: hidden; display: grid !important; }
+/* Settings holds its space when hidden so the title stays centred. The tally
+   takes that space over while tracking, so the placeholder stands down. */
+#btnMarks:not([hidden]) ~ #btnSettings[hidden] { display: none !important; }
+
+/* How many points you have dropped on this area, and the way in to them. */
+#btnMarks {
+  width: auto;
+  min-width: 48px;
+  padding: 0 9px;
+  grid-auto-flow: column;
+  gap: 5px;
+}
+#btnMarks span {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------ screens */
+
+/* The landmark stands between body and the screens, so it inherits the column
+   that body used to give them directly. */
+main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.screen { flex: 1; min-height: 0; position: relative; }
+.scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* ------------------------------------------------- the ledger of areas */
+
+.ledger { border-bottom: 1px solid var(--rule); }
+
+.area {
+  display: grid;
+  grid-template-columns: 66px minmax(0, 1fr) 102px;
+  grid-template-areas:
+    "plan name more"
+    "plan spec go";
+  align-items: start;
+  column-gap: 12px;
+  row-gap: 3px;
+  padding: 12px 12px 13px;
+  border-top: 1px solid var(--rule);
+  background: var(--paper);
+}
+
+/* Each area draws its own plan, the way a field book would: framed by
+   neatline ticks, with its marks where they fall and a true scale bar that
+   shows once the sheet is big enough to read one. */
+.area-plan {
+  grid-area: plan;
+  align-self: center;
+  width: 66px;
+  height: 66px;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+}
+.area-plan svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.area-plan .neat { fill: none; stroke: var(--rule-strong); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.area-plan .mark {
+  fill: var(--paper-raised);
+  stroke: var(--ink);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+.area-plan .scale { display: none; }
+.area-plan .scale path { fill: none; stroke: var(--ink-2); stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+.area-plan .scale text {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  fill: var(--ink-2);
+}
+.area-plan .outline {
+  fill: var(--ink);
+  fill-opacity: 0.07;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+.area-plan .corner { fill: var(--ink); stroke: none; }
+
+.area-name {
+  grid-area: name;
+  align-self: end;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 23px;
+  line-height: 1.05;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+/* one measured line, the units set as instrument labels */
+.area-spec {
+  grid-area: spec;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  margin: 0;
+  align-self: center;
+}
+.area-spec div { display: flex; align-items: baseline; gap: 4px; }
+.area-spec dt {
+  order: 2;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.area-spec dd {
+  order: 1;
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.area-more { grid-area: more; justify-self: end; width: 44px; height: 44px; margin: -5px -7px 0 0; }
+.area-go { grid-area: go; align-self: center; min-height: 46px; padding: 10px 8px; font-size: 18px; }
+.area-go .icon { width: 18px; height: 18px; }
+
+/* The sheet before anything is on it: an area caught half surveyed, in the
+   same stations and ink the drawing screen uses. */
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 40px 24px 36px;
+  text-align: center;
+  color: var(--ink-2);
+}
+.empty svg { width: 168px; height: 126px; margin-bottom: 14px; overflow: visible; }
+.empty h2 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 25px;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: var(--ink);
+}
+.empty p { margin: 0; max-width: 34ch; }
+.empty .e-leg { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: miter; }
+.empty .e-next { fill: none; stroke: var(--ink); stroke-width: 2; stroke-dasharray: 6 5; }
+.empty .e-home { fill: none; stroke: var(--rule-strong); stroke-width: 1.5; stroke-dasharray: 2 5; }
+.empty .e-aim { fill: none; stroke: var(--ink); stroke-width: 1.5; }
+.empty .e-stn circle { fill: var(--ink); stroke: var(--paper); stroke-width: 2; }
+.empty .e-stn text {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--paper);
+}
+
+/* ------------------------------------------------------------ buttons */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 18px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  cursor: pointer;
+}
+.btn:active { background: var(--paper-sunk); }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.btn .icon { width: 21px; height: 21px; }
+
+.btn-filled { background: var(--ink); color: var(--paper); }
+.btn-filled:active { background: var(--ink-2); }
+
+/* On a signal-coloured ground the chrome inverts to the panel's own foreground. */
+.btn-onsignal {
+  color: inherit;
+  background: transparent;
+  border-color: currentColor;
+}
+.btn-onsignal:active { background: rgba(0, 0, 0, 0.14); }
+
+.actions { display: grid; gap: 10px; padding: 20px 14px 4px; }
+
+.note {
+  padding: 18px 14px calc(28px + var(--safe-b));
+  color: var(--ink-2);
+  font-size: 15px;
+}
+.note p { margin: 0; }
+.note b { color: var(--ink); font-weight: 600; }
+
+/* The ledger fills at least the screen, so a short list still leaves the
+   footer at the foot of the window rather than halfway up it. */
+.ledger-col { display: flex; flex-direction: column; min-height: 100%; }
+.ledger-col > * { flex-shrink: 0; }
+
+.main-footer {
+  margin-top: auto;
+  display: grid;
+  justify-content: center;
+  gap: 3px;
+  padding: 8px 14px calc(9px + var(--safe-b));
+  border-top: 1px solid var(--rule);
+  color: var(--ink-3);
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.footer-credit { margin: 0; }
+.footer-credit a {
+  color: inherit;
+  text-decoration: none;
+  text-underline-offset: 3px;
+}
+.footer-credit a:hover { color: var(--ink); text-decoration: underline; }
+.footer-credit a:focus-visible {
+  color: var(--ink);
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.footer-logo {
+  width: 17px;
+  height: 11px;
+  margin: 0 4px 0 2px;
+  vertical-align: -1px;
+}
+.footer-logo-t { fill: var(--ink); }
+.footer-logo-a { fill: #0070fc; }
+
+/* The key to the sheet: each way in, beside the symbol its tool carries. */
+.ways { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.ways li {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  align-items: center;
+  column-gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ways .icon {
+  width: 36px;
+  height: 36px;
+  padding: 7px;
+  color: var(--ink);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+}
+.ways-then { padding-top: 12px; }
+
+/* The title block: how much is on the sheet, labelled like every row. */
+.tally {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 18px;
+  margin: 0;
+  padding: 11px 14px 10px;
+}
+.tally div { display: flex; align-items: baseline; gap: 5px; }
+.tally dd {
+  order: 1;
+  margin: 0;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.tally dt {
+  order: 2;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------ overview */
+
+/* Wide screens only, beside the ledger. Labels are set like the station
+   numbers: ink on paper, and inverted when their row is pointed at. */
+.overview { position: relative; background: var(--paper-sunk); }
+.ov-label span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  padding: 3px 7px 2px;
+  white-space: nowrap;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.ov-label.is-lit span { color: var(--paper); background: var(--ink); border-color: var(--paper); }
+
+/* ---------------------------------------------------------------- map */
+
+#map { position: absolute; inset: 0; background: var(--paper-sunk); }
+.leaflet-container { font: inherit; background: var(--paper-sunk); }
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: var(--paper) !important;
+  color: var(--ink-2) !important;
+}
+.leaflet-control-attribution a { color: var(--ink-2) !important; }
+/* The zoom control starts under whatever is stacked at the top of the map: the
+   drawing readout, then the warning strip. Both are measured in syncDock(),
+   because both change height with the words in them, and the readout grows a
+   row of its own while the boundary is being walked. Leaflet's own 10px margin
+   still applies underneath, so these are only the extra. */
+#scrMap .leaflet-top.leaflet-right {
+  margin-top: calc(var(--readout-h, 0px) + var(--warn-h, 0px));
+}
+/* Attribution is a licence condition, so it is never allowed behind the answer
+   panel or the edit bar. --dock-h is whatever is currently docked at the
+   bottom; see syncDock() in app.js. */
+#scrMap .leaflet-bottom { bottom: var(--dock-h, 0px); }
+
+.leaflet-bar a {
+  background: var(--paper) !important;
+  color: var(--ink) !important;
+  border-bottom-color: var(--rule) !important;
+  /* Leaflet ships 30 px controls. This is a gloves-on tool. */
+  width: 44px !important;
+  height: 44px !important;
+  line-height: 44px !important;
+  font-size: 22px !important;
+}
+
+/* Numbered survey stations, not map pins. */
+/* The visible dot stays 28 px, because a bigger one hides the corner it marks.
+   The thing your thumb has to find is 44 px, drawn outside the circle where it
+   costs nothing to see. */
+.vertex::before,
+.station::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+/* No position of our own here. Leaflet lifts every marker out of the flow with
+   position: absolute and then places it by transform; this rule sits after
+   leaflet.css at the same specificity, so declaring position here quietly wins
+   and drops the discs back into normal flow. They then stack down the pane in
+   DOM order, each half an icon below the last, and the map ends up drawing a
+   column instead of a survey. The 44 px target above still gets its containing
+   block, absolute is a positioned ancestor too. */
+.vertex,
+.station {
+  display: grid;
+  place-items: center;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--paper);
+  background: var(--ink);
+  border: 2px solid var(--paper);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* A mark is a station you dropped, not a corner you surveyed, so it is the
+   vertex inverted: paper disc, ink ring. Same instrument, different hand. */
+.station {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--ink);
+}
+
+/* --------------------------------------------- measurements while drawing */
+
+.readout {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  z-index: 900;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  box-shadow: var(--shadow-lift);
+}
+.readout-row { display: flex; }
+.readout-row + .readout-row { border-top: 1px solid var(--rule); }
+.readout .cell {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+  padding: 9px 12px;
+  border-right: 1px solid var(--rule);
+}
+.readout .cell:last-child { border-right: 0; }
+.readout .value {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+.readout-hint {
+  margin: 0;
+  padding: 7px 12px 8px;
+  border-top: 1px solid var(--rule);
+  font-size: 14px;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------- warning strip */
+
+/* Under the drawing readout when there is one, and at the top of the map when
+   there is not. Two ink strips stacked at the top of a phone would leave no map
+   to aim at, so the readout's own measured height decides where this starts. */
+.warn {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: calc(10px + var(--readout-h, 0px));
+  z-index: 950;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 14px;
+  line-height: 1.4;
+  box-shadow: var(--shadow-lift);
+}
+.warn .icon { width: 20px; height: 20px; margin-top: 1px; }
+
+/* ---------------------------------------------------------- the key column */
+
+/* One column, bottom right, where a thumb finds it without looking. It rides
+   above whatever is docked at the bottom and stays right of the map credit at
+   bottom left. The keys are laid out by the column rather than each holding
+   its own offset, so a key that goes away closes the gap it left instead of
+   leaving a hole in the stack. The column itself is not a target, only the
+   keys in it are, or its empty width would eat taps meant for the map. */
+.map-keys {
+  position: absolute;
+  right: 10px;
+  bottom: calc(var(--dock-h, 0px) + var(--credit-h, 0px) + 12px);
+  z-index: 900;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  pointer-events: none;
+}
+.map-keys > * { pointer-events: auto; }
+
+/* ----------------------------------------------------------- the mark key */
+
+/* An instrument key, not a floating action button: square corners, paper
+   ground, ink rule. */
+.mark-key {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  width: 76px;
+  min-height: 70px;
+  padding: 9px 6px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lift);
+  cursor: pointer;
+}
+.mark-key .icon { width: 27px; height: 27px; }
+.mark-key:active { background: var(--paper-sunk); }
+
+/* The corner key carries the station it is about to place, at the size it will
+   be on the map, rather than an icon of one: you read what number is coming
+   before you make it, then find that number on the ground. */
+.corner-disc {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 50%;
+}
+
+/* ------------------------------------------------------------ the follow key */
+
+/* The same instrument key, half the height, stacked directly above MARK so the
+   thumb finds both in the same corner. Inverted while it is showing, because
+   it only exists when the map has stopped following you, it is a state you
+   are in, not just a thing you can do. */
+.recentre {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 76px;
+  min-height: 36px;
+  padding: 6px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1.5px solid var(--paper);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lift);
+  cursor: pointer;
+}
+.recentre .icon { width: 17px; height: 17px; }
+.recentre span { white-space: nowrap; }
+.recentre:active { background: var(--ink-2); }
+
+/* ------------------------------------------------------- the last mark key */
+
+/* The follow key's twin: same half-height key, paper ground, because this one
+   offers an action rather than reporting a state. It carries the mark's own
+   disc rather than an icon, so the key and the thing it opens are recognisably
+   the same object, you look at the key, then find that number on the map. */
+.last-key {
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  width: 76px;
+  min-height: 36px;
+  padding: 6px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lift);
+  cursor: pointer;
+}
+/* The disc inverted, the way it is on a paper ground everywhere else. */
+.last-disc {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--paper);
+  background: var(--ink);
+  border-radius: 50%;
+}
+.last-key:active { background: var(--paper-sunk); }
+
+/* -------------------------------------------------- moving a mark by hand */
+
+/* Top of the map, where the accuracy warning sits, because for as long as this
+   is up the map is one thing: a disc you are placing. The warning stands down
+   while it is, the answer panel keeps warning in colour and sound, which is
+   the channel that matters, and two ink strips stacked at the top of a phone
+   leave no map to aim at. */
+.move-bar {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  z-index: 960;
+  padding: 10px 12px;
+  background: var(--paper);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  box-shadow: var(--shadow-lift);
+}
+.move-text {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.move-acts { display: flex; gap: 8px; }
+.move-acts .btn { flex: 1 1 0; min-height: 44px; }
+
+#scrMap.is-moving .warn { display: none; }
+
+/* The disc in hand, and the ones it must not be confused with. The held one
+   grows and takes the ink ground of a corner being surveyed, it is being
+   placed by hand now, the same as a corner is. The rest fade back rather than
+   disappear, because they are what you are lining it up against. */
+/* Its size comes from the icon Leaflet is given, not from here: Leaflet centres
+   a divIcon by halving the size it was told, so a disc grown in CSS alone slides
+   off the point it is placing. */
+.station.is-held {
+  font-size: 16px;
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--paper);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+.station.is-quiet { opacity: 0.45; }
+
+/* The one the LAST key opens, and the one every menu you just came out of was
+   about. A heavier ring was not enough: on a survey where every disc has three
+   behind it, "which one did I just centre on" is a question you can be left
+   asking with the answer on the screen.
+
+   So it inverts, ink ground, paper number, ink outline outside the paper ring
+   and it is lifted above its neighbours in JS, since Leaflet stacks discs by
+   how far down the screen they are and knows nothing about which one you are
+   looking for. Still no size change: it must cover exactly what it covered
+   before. The green, amber and red belong to the answer, so the difference is
+   carried by weight and inversion, the way the rest of this app carries it. */
+.station.is-open {
+  color: var(--paper);
+  background: var(--ink);
+  border-color: var(--paper);
+  border-width: 3px;
+  outline: 2px solid var(--ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* A disc standing on others. Two solid shadows draw the one behind it, offset
+   down and right, ringed the same way, a stack of counters, read at a glance
+   from arm's length, and the count sits on its shoulder so there is no
+   guessing how deep it goes. Nothing here moves the disc: it is still exactly
+   on its point, which is the whole reason the pile is drawn rather than the
+   marks nudged apart. */
+.station.is-pile {
+  box-shadow:
+    3px 3px 0 0 var(--paper),
+    3px 3px 0 2px var(--ink),
+    0 2px 6px rgba(0, 0, 0, 0.45);
+}
+.station.is-open.is-pile {
+  box-shadow:
+    3px 3px 0 0 var(--ink),
+    3px 3px 0 2px var(--paper),
+    0 2px 8px rgba(0, 0, 0, 0.5);
+}
+/* Out of the grid rather than in it, or the number would shift up to make room
+   for it. Leaflet positions every marker absolutely, so this has its
+   containing block already. */
+.station-more {
+  position: absolute;
+  top: -7px;
+  right: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 3px;
+  display: grid;
+  place-items: center;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1.5px solid var(--paper);
+  border-radius: 9px;
+}
+.station.is-open .station-more {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--ink);
+}
+
+/* --------------------------------------------------------------- dock */
+
+.dock {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background: var(--paper);
+  border-top: 1px solid var(--rule);
+  box-shadow: var(--shadow-dock);
+  padding-bottom: var(--safe-b);
+}
+
+.tools { display: flex; border-bottom: 1px solid var(--rule); }
+.tool {
+  flex: 1;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-height: 62px;
+  padding: 9px 2px;
+  background: none;
+  border: 0;
+  border-right: 1px solid var(--rule);
+  color: var(--ink);
+  cursor: pointer;
+}
+.tool:last-child { border-right: 0; }
+.tool:active { background: var(--paper-sunk); }
+.tool:disabled { opacity: 0.35; }
+/* Walk is a mode rather than an action, and filled means on here as it does on
+   every switch and segment in this app. */
+.tool[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.tool[aria-pressed="true"]:active { background: var(--ink-2); }
+.tool span {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+/* Six tools across the narrowest phones still in use. The labels give up half
+   a point rather than wrap: a tool row two lines tall takes the height out of
+   the map it is drawn under. */
+@media (max-width: 359px) {
+  .tool { padding-inline: 1px; }
+  .tool span { font-size: 11.5px; letter-spacing: 0.04em; }
+}
+
+.dock-actions { display: flex; gap: 10px; padding: 12px 12px 14px; }
+.dock-actions .btn { flex: 1; }
+
+/* ================================================== THE ANSWER PANEL == */
+
+.panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink);
+  border-top: 1px solid var(--rule);
+  box-shadow: var(--shadow-dock);
+}
+.panel[data-status="inside"]  { background: var(--sig-inside);  color: var(--on-inside);  border-top-color: transparent; }
+.panel[data-status="border"]  { background: var(--sig-border);  color: var(--on-border);  border-top-color: transparent; }
+.panel[data-status="outside"] { background: var(--sig-outside); color: var(--on-outside); border-top-color: transparent; }
+
+/* Unsure is the one answer that is not an answer, so it is deliberately not a
+   colour of the signal palette: at arm's length, in sun, "no colour" reads as
+   "no verdict" faster than any fourth hue could. It does not breathe either:
+   the stillness is the difference between "I cannot tell" and "act now". */
+.panel[data-status="unsure"] {
+  background: var(--paper-sunk);
+  color: var(--ink);
+  border-top: 3px solid var(--rule-strong);
+}
+
+/* Still settling: the reading is real and shown, but the receiver has not yet
+   given us enough good fixes to stand behind it. A hairline, not a banner. */
+.panel[data-provisional] .figure-caption { opacity: 0.85; }
+.panel[data-provisional]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 2;
+  background: repeating-linear-gradient(90deg,
+    currentColor 0 8px, transparent 8px 16px);
+  opacity: 0.5;
+}
+
+.panel-body {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 5px;
+  padding: 8px 16px calc(8px + var(--safe-b));
+}
+
+/* The one authored moment: the panel breathes while it is warning you.
+   A separate layer so the type never dims with it. */
+.panel-pulse { position: absolute; inset: 0; z-index: 0; background: #fff; opacity: 0; }
+.panel[data-status="border"]  .panel-pulse { animation: breathe 1.8s var(--ease-settle) infinite; }
+.panel[data-status="outside"] .panel-pulse { animation: breathe 1.1s var(--ease-settle) infinite; }
+@keyframes breathe {
+  0%, 100% { opacity: 0; }
+  18%      { opacity: 0.22; }
+}
+
+/* Verdict and figure share one line. Stacked they read beautifully and eat
+   half the phone; side by side, as a label and its reading, they cost 60px
+   less and give the argument back to the map. */
+.verdict-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.verdict {
+  margin: 0;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: clamp(25px, 7.6vw, 34px);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.figure {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  line-height: 0.82;
+}
+.figure-num {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: clamp(44px, 14.5vw, 62px);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  font-variant-numeric: tabular-nums;
+}
+.figure-unit {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: clamp(20px, 6.2vw, 27px);
+  font-weight: 600;
+  opacity: 0.75;
+}
+.figure-caption {
+  margin: -2px 0 0;
+  text-align: right;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* --------------------------------------------------- the approach gauge */
+
+/* a button, because the one part of the panel that has to be learnt should be
+   able to say what it is */
+.gauge {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  margin-top: 1px;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/* the pointer rides in its own lane, carrying its own name */
+.gauge-you { position: relative; height: 13px; }
+.gauge-you span {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: left 420ms var(--ease-settle);
+}
+.gauge-you span::after {          /* the needle, dropping onto the rule below */
+  content: '';
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 7px solid currentColor;
+}
+
+.gauge-scale {
+  position: relative;
+  height: 14px;
+  color: inherit;
+  opacity: 0.88;
+  font-size: 11.5px;
+}
+.gauge-scale span { position: absolute; top: 0; transform: translateX(-50%); white-space: nowrap; }
+.gauge-scale span:first-child { transform: none; }
+.gauge-scale span:last-child { transform: translateX(-100%); }
+.gauge-scale .edge {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.gauge-track {
+  position: relative;
+  height: 24px;
+  margin-top: 8px;   /* room for the needle above the rule */
+  border: 1px solid currentColor;
+  background: rgba(0, 0, 0, 0.09);
+}
+
+/* Each half says what it is. The verdict word above repeats the name of the
+   half the pointer is standing in, which teaches the gauge in one glance. */
+.gauge-zone {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  /* --label-quiet, not a smaller number: measured on the built panel, anything
+     under 0.85 puts 11px type below 4.5:1 on the amber and the red. Quiet is
+     worth having; quiet enough to lose in sun is not. */
+  display: flex;
+  align-items: center;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--label-quiet);
+  pointer-events: none;
+}
+.gauge-zone.in  { left: 0;  padding-left: 7px; }
+.gauge-zone.out { right: 0; padding-right: 7px; }
+
+/* a ruled strip: a tick every eighth, the quarters landing on the numbers */
+.gauge-ticks { position: absolute; inset: 0; z-index: 0; }
+.gauge-ticks i {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 8px;
+  margin-top: -4px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.gauge-ticks i.major { height: 100%; margin-top: 0; top: 0; opacity: 0.4; }
+
+/* the border band, hatched like a boundary strip on a survey sheet */
+.gauge-band {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-image: repeating-linear-gradient(
+    -45deg, currentColor 0 1.5px, transparent 1.5px 7px);
+  opacity: 0.55;
+  border-left: 1px solid currentColor;
+  border-right: 1px solid currentColor;
+}
+
+.gauge-zero {
+  position: absolute;
+  z-index: 3;
+  top: -4px;
+  bottom: -4px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: currentColor;
+}
+
+/* you, sliding along the rule */
+.gauge-mark {
+  position: absolute;
+  z-index: 4;
+  top: -1px;
+  bottom: -1px;
+  left: 50%;
+  width: 4px;
+  margin-left: -2px;
+  background: currentColor;
+  box-shadow: 0 0 0 2.5px var(--sig-mark-halo, rgba(255, 255, 255, 0.55));
+  transition: left 420ms var(--ease-settle);
+}
+.panel[data-status="border"] { --sig-mark-halo: rgba(20, 22, 26, 0.42); }
+/* On the unsure panel the mark is ink on paper in both themes, so the halo is
+   simply the background again: a clean gap around it, whichever way it flips. */
+.panel[data-status="unsure"] { --sig-mark-halo: var(--paper-sunk); }
+.gauge.is-clamped .gauge-mark,
+/* Pinned at the end of the scale, so the label says so by going quiet, down
+   to the floor and no further. The pointer sitting hard against the end is the
+   louder half of that signal anyway. */
+.gauge.is-clamped .gauge-you span { opacity: var(--label-quiet); }
+
+/* ----------------------------------------------------- panel metadata */
+
+/* One ruled line, and a way in: tapping it opens what the numbers mean. */
+/* Three readings on one ruled line, and the whole line opens the GPS check.
+   The rule everywhere else in this app is 44px for anything a glove has to
+   find, and this strip was 29, small enough to read but not to hit. The line
+   keeps its drawn height; the target grows around it. */
+.meta {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 1px 0 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 1px solid currentColor;
+  border-left: 0;
+  border-right: 0;
+  cursor: pointer;
+}
+.meta > span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 4px;
+  overflow: hidden;
+  border-right: 1px solid currentColor;
+}
+.meta > span:last-child { border-right: 0; }
+.meta b {
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: var(--label-quiet);
+}
+.meta i {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.panel-actions { display: flex; gap: 10px; margin-top: 1px; }
+.panel-actions .btn { flex: 1; min-height: 46px; }
+
+/* Waiting for a fix: still paper, so a grey screen never reads as an answer. */
+.panel[data-status="waiting"] .gauge,
+.panel[data-status="waiting"] .figure { opacity: 0.4; }
+
+/* ----------------------------------------------------------- settings */
+
+.pref {
+  display: block;
+  padding: 18px 14px 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.pref h2 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.pref-note { margin: 8px 0 0; color: var(--ink-2); font-size: 14.5px; line-height: 1.5; }
+.pref-note b { color: var(--ink); }
+.pref > .btn { margin-top: 12px; }
+
+.pref-figure {
+  display: block;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pref-figure .unit { font-size: 22px; font-weight: 600; color: var(--ink-2); margin-left: 4px; }
+
+#bufferRange {
+  width: 100%;
+  height: 44px;
+  margin: 4px 0 0;
+  accent-color: var(--ink);
+}
+.pref-scale { display: flex; justify-content: space-between; margin-top: -4px; }
+
+.signal-tests { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.sig-test {
+  flex: 1 1 calc(50% - 4px);   /* four signals wrap two-up rather than shrink to nothing */
+  min-height: 54px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+/* Legitimate use of the signal palette: these buttons *are* the signals. */
+.sig-test[data-status="inside"]  { background: var(--sig-inside);  color: var(--on-inside); }
+.sig-test[data-status="unsure"]  { background: var(--paper-sunk);  color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--rule-strong); }
+.sig-test[data-status="border"]  { background: var(--sig-border);  color: var(--on-border); }
+.sig-test[data-status="outside"] { background: var(--sig-outside); color: var(--on-outside); }
+.sig-test:active { filter: brightness(1.15); }
+
+.segmented { display: flex; border: 1.5px solid var(--ink); border-radius: 2px; }
+.segmented button {
+  flex: 1;
+  min-height: 50px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 0;
+  border-right: 1.5px solid var(--ink);
+  cursor: pointer;
+}
+.segmented button:last-child { border-right: 0; }
+.segmented button[aria-checked="true"] { background: var(--ink); color: var(--paper); }
+
+.pref-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+.switch-text { flex: 1; }
+.switch-text b { font-weight: 600; }
+.switch-text b, .switch-text .pref-note { display: block; }
+.switch-text .pref-note { margin-top: 2px; }
+
+.switch {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: 58px;
+  height: 34px;
+  margin: 0;
+  background: var(--paper-raised);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  position: relative;
+  cursor: pointer;
+}
+.switch::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: var(--rule-strong);
+  transition: left 180ms var(--ease-settle), background 180ms linear;
+}
+.switch:checked { background: var(--ink); }
+.switch:checked::after { left: 28px; background: var(--paper); }
+
+/* ------------------------------------------------------- privacy page */
+
+.privacy-page #title { margin-left: 0; }
+.privacy-page #topbar a { text-decoration: none; }
+.privacy { flex: 1; min-height: 0; }
+.privacy-col { max-width: 720px; margin-inline: auto; }
+.privacy .pref-note a,
+.colophon a { color: var(--ink); text-underline-offset: 3px; }
+.privacy .pref-note a:focus-visible,
+.colophon a:focus-visible,
+.privacy-page #topbar a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.privacy code { font-family: inherit; text-transform: none; letter-spacing: 0.02em; overflow-wrap: anywhere; }
+.privacy-updated {
+  margin: 0;
+  padding: 14px 14px calc(32px + var(--safe-b));
+  color: var(--ink-3);
+  font-size: 13px;
+}
+
+/* The last line on the last screen: the way to the full data note. */
+.colophon {
+  margin: 0;
+  padding: 20px 14px calc(32px + var(--safe-b));
+  color: var(--ink-3);
+  font-size: 13.5px;
+}
+
+/* -------------------------------------------------------- toast, sheet */
+
+#toast {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(20px + var(--safe-b));
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 15px;
+  box-shadow: var(--shadow-lift);
+  animation: rise 260ms var(--ease-settle);
+}
+/* The map screen docks the answer panel or the edit bar at the very bottom:
+   exactly where a toast would otherwise land, hiding Stop/Mute or Save right
+   when a mark or a warning just fired. Clear it by the same height the map's
+   own bottom controls already use. */
+body[data-screen="map"] #toast { bottom: calc(20px + var(--safe-b) + var(--dock-h, 0px)); }
+#toast span { flex: 1; }
+#toast button {
+  flex: none;
+  min-height: 44px;
+  padding: 8px 16px;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  background: var(--paper);
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+@keyframes rise { from { transform: translateY(14px); opacity: 0; } }
+
+#sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(10, 11, 13, 0.55);
+}
+.sheet-card {
+  width: 100%;
+  max-height: 82%;
+  overflow-y: auto;
+  padding: 18px 14px calc(16px + var(--safe-b));
+  background: var(--paper);
+  border-top: 2px solid var(--ink);
+  animation: rise 300ms var(--ease-settle);
+}
+.sheet-card h2 {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+.sheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 11px 6px;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+.sheet-row:active { background: var(--paper-sunk); }
+.sheet-row .icon { width: 22px; height: 22px; color: var(--ink-2); }
+.sheet-row strong { display: block; font-weight: 600; font-size: 17px; }
+.sheet-row em { font-style: normal; color: var(--ink-2); font-size: 14px; }
+/* Delete used to borrow --sig-outside, which is the app's word for "you have
+   crossed the line". Spending that colour on a menu item weakens it in the one
+   place it has to mean something. Weight, a rule and the warning glyph carry
+   the caution instead. */
+.sheet-row.danger { font-weight: 600; box-shadow: inset 3px 0 0 var(--ink); }
+.sheet-row.danger .icon { color: var(--ink); }
+#sheetClose { margin-top: 16px; }
+
+/* A question that wants typing rides at the top: the keyboard takes the foot of
+   the screen, and a field hidden under it cannot be answered. */
+#sheet.is-form { align-items: flex-start; }
+#sheet.is-form .sheet-card {
+  padding: calc(18px + var(--safe-t)) 14px 16px;
+  border-top: 0;
+  border-bottom: 2px solid var(--ink);
+  animation-name: drop;
+}
+@keyframes drop { from { transform: translateY(-14px); opacity: 0; } }
+.sheet-form { display: grid; gap: 10px; }
+.sheet-form label {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+/* 17px: below 16px iOS zooms the page in when the field takes focus. */
+.sheet-form input {
+  width: 100%;
+  min-height: 52px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 17px;
+  color: var(--ink);
+  background: var(--paper-raised);
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+}
+
+/* what is held on the phone: a ruled inventory, one line per thing, read the
+   same way as every other list of figures in here */
+.store-list { display: grid; gap: 0; margin: 0 0 12px; border-top: 1px solid var(--rule); }
+.store-list > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2px;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+.store-list dt {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.store-list dd { margin: 0; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.store-list dd b { color: var(--ink); font-weight: 600; }
+@media (min-width: 560px) {
+  .store-list > div { grid-template-columns: 170px 1fr; gap: 12px; align-items: baseline; }
+}
+
+/* the GPS check: a service sheet, ruled like the rest of the instrument */
+.gps-table { display: grid; gap: 0; margin-bottom: 14px; }
+.gps-table > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 2px;
+  border-bottom: 1px solid var(--rule);
+}
+.gps-table dt {
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+.gps-table dd {
+  margin: 0;
+  font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.sheet-note {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.sheet-note b { color: var(--ink); font-weight: 600; }
+
+/* ------------------------------------------------------------ motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  /* Losing the pulse would lose a warning channel, so slow it instead. */
+  .panel[data-status="border"] .panel-pulse,
+  .panel[data-status="outside"] .panel-pulse {
+    animation: breathe 2.4s steps(2, jump-none) infinite !important;
+    animation-duration: 2.4s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+
+/* ------------------------------------------------------- phone on its side */
+
+/* Turned sideways, a panel docked along the bottom takes two thirds of the
+   screen and leaves a letterbox of map, and below 120px of map the app stops
+   panning to keep up with you at all, silently. So in landscape the answer
+   moves to the right edge and the map takes the rest: the same panel, the same
+   order, stood on end. The map is genuinely narrower rather than covered, so
+   Leaflet measures what it actually has.
+
+   Keyed off height, not orientation alone: a tablet in landscape has room for
+   the docked layout and keeps it. */
+@media (max-height: 560px) and (min-aspect-ratio: 1/1) {
+  #scrMap { --panel-w: clamp(260px, 42%, 380px); }
+
+  #scrMap.is-tracking #map { right: var(--panel-w); }
+  #scrMap.is-tracking .panel {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    width: var(--panel-w);
+    border-top: none;
+    border-left: 1px solid var(--rule);
+  }
+  #scrMap.is-tracking .panel[data-status="inside"],
+  #scrMap.is-tracking .panel[data-status="border"],
+  #scrMap.is-tracking .panel[data-status="outside"] { border-left-color: transparent; }
+
+  /* The panel is no narrower than it is in portrait, so the answer still shares
+     its line. What changes is the height available, so it may need to scroll on
+     the shortest screens rather than clip the controls off the bottom. */
+  #scrMap.is-tracking .panel-body { max-height: 100%; overflow-y: auto; }
+
+  /* Nothing is docked along the bottom any more, so the keys and the map
+     credit stop reserving space for it and move inside the narrowed map. */
+  #scrMap.is-tracking .leaflet-bottom { bottom: 0; }
+  #scrMap.is-tracking .map-keys {
+    right: calc(var(--panel-w) + 10px);
+    bottom: calc(var(--credit-h, 0px) + 12px);
+  }
+  #scrMap.is-tracking .move-bar { right: calc(var(--panel-w) + 10px); }
+
+  /* Drawing gets the same treatment for the same reason. Stacked, the readout
+     and the drawing dock took two thirds of a sideways screen between them and
+     left a letterbox with the key column standing in front of it. So both lie
+     down: the dock stands its two rows side by side, and the readout's walking
+     pair joins the measurements on one line. Sideways is width the screen has
+     and height it does not. */
+  #editBar { display: flex; align-items: stretch; }
+  #editBar .tools { flex: 1; border-bottom: 0; border-right: 1px solid var(--rule); }
+  #editBar .dock-actions { align-items: center; padding: 8px 10px; }
+  #editBar .dock-actions .btn { flex: 0 1 auto; min-height: 44px; padding-inline: 18px; }
+
+  .readout { display: flex; flex-wrap: wrap; }
+  .readout-row { flex: 1 1 auto; }
+  .readout-row + .readout-row { border-top: 0; border-left: 1px solid var(--rule); }
+  .readout-hint { flex: 1 0 100%; }
+
+  /* What is left of the map sideways is a letterbox, and the key column and
+     Leaflet's zoom control both want the right of it. Tracking never has this
+     problem because the panel narrows the map and puts the full height of it
+     between them. Drawing has no such luxury, so the keys lie down into a row
+     along the bottom and the zoom control goes to the other side. */
+  #scrMap:not(.is-tracking) .leaflet-top.leaflet-right { right: auto; left: 0; }
+  #scrMap.is-walking .map-keys { grid-auto-flow: column; align-items: end; gap: 6px; }
+  #scrMap.is-walking .mark-key { min-height: 56px; }
+}
+
+/* --------------------------------------------------- larger phones/tablets */
+
+@media (min-width: 560px) {
+  .area { grid-template-columns: 104px 1fr auto; column-gap: 18px; }
+  .area-plan { width: 104px; height: 104px; }
+  .area-plan .scale { display: inline; }
+  .tally, .note { padding-inline: 12px; }
+  .area-go { grid-area: go; justify-self: start; width: auto; padding-inline: 34px; }
+  .actions { grid-template-columns: 1fr 1fr; }
+  .note, .colophon, .pref, .ledger, .tally { max-width: 720px; margin-inline: auto; }
+  .actions { max-width: 720px; margin-inline: auto; }
+  .panel-body { max-width: 620px; margin-inline: auto; }
+  .readout { left: 50%; transform: translateX(-50%); width: min(560px, calc(100% - 20px)); }
+}
+
+/* Two actions that belong together, side by side while there is room. */
+.pref-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pref-row .btn { flex: 1 1 auto; }
+
+/* Readiness: three ways this app can reach you, and whether each is working. */
+.ready-list { margin-top: 14px; border-top: 1px solid var(--rule); }
+.ready-row {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.ready-row span:last-child { display: block; }
+.ready-row b { font-weight: 600; }
+.ready-row em { display: block; font-style: normal; font-size: 13px; color: var(--ink-2); }
+.ready-mark {
+  flex: 0 0 auto;
+  width: 1.2em;
+  font-weight: 700;
+  text-align: center;
+}
+/* The cross is the only thing on this list that has to be found in a hurry,
+   and it may not lean on the signal palette to do it, so it leans on weight
+   and a rule instead. */
+.ready-row[data-ok="false"] { font-weight: 600; }
+.ready-row[data-ok="false"] .ready-mark { color: var(--ink); }
+.ready-row[data-ok="unknown"] .ready-mark { color: var(--ink-2); }
+
+/* ---------------------------------------------------- pointer and desk */
+
+/* Browser surfaces carry the sheet too. */
+::selection { background: var(--ink); color: var(--paper); }
+.scroll, .ledger-col { scrollbar-width: thin; scrollbar-color: var(--rule-strong) transparent; }
+
+/* A mouse can say where it is before it says anything else. Every key answers
+   it with the ground it goes to when pressed, and nothing animates: the sheet
+   is drawn, not staged. Touch never sees any of this. */
+@media (hover: hover) {
+  .btn:hover:not(:disabled):not(:active),
+  .icon-btn:hover:not(:active),
+  .tool:hover:not(:disabled):not(:active):not([aria-pressed="true"]),
+  .mark-key:hover:not(:active),
+  .last-key:hover:not(:active),
+  .sheet-row:hover:not(:active),
+  .segmented button:hover:not([aria-checked="true"]),
+  .lang-switch button:hover:not([aria-checked="true"]) { background: var(--paper-sunk); }
+
+  .btn-filled:hover:not(:disabled):not(:active),
+  .recentre:hover:not(:active),
+  .tool[aria-pressed="true"]:hover:not(:active) {
+    background: color-mix(in srgb, var(--ink) 84%, var(--paper));
+  }
+  .btn-onsignal:hover:not(:active) { background: rgba(0, 0, 0, 0.08); }
+  .sig-test:hover:not(:active) { filter: brightness(1.07); }
+
+  /* A row is pointed at as one thing, and the overview answers for it. */
+  .has-overview .area { cursor: pointer; }
+  .area:hover, .area.is-lit { background: var(--paper-raised); }
+  .area:hover .area-plan, .area.is-lit .area-plan { border-color: var(--rule-strong); }
+}
+
+/* --------------------------------------------------------------- desk */
+
+@media (min-width: 1024px) {
+  /* The bar spans a desk, so it says what the app is at the left and names
+     the settings key at the right, instead of two icons a screen apart. */
+  #topbar { position: relative; padding-inline: 14px; }
+  /* Centred on the bar, whatever stands either side of it. */
+  #title { position: absolute; left: 50%; transform: translateX(-50%); max-width: 44%; margin: 0 !important; }
+  #btnMarks, #btnSettings { margin-left: auto; }
+  #btnMarks:not([hidden]) ~ #btnSettings { margin-left: 0; }
+  body[data-screen="fields"] .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: absolute;
+    left: 22px;
+    font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .brand svg { width: 26px; height: 26px; fill: none; stroke: var(--ink); stroke-width: 36; stroke-linejoin: miter; }
+  .brand circle { fill: var(--ink); stroke: none; }
+  #btnSettings { width: auto; padding-inline: 12px; grid-auto-flow: column; gap: 8px; }
+  #btnSettings .icon-word {
+    display: inline;
+    font-family: 'Barlow Condensed', 'Barlow', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Ledger down the left, the ground on the right. The ledger scrolls on its
+     own and the map stays where it is. */
+  #scrFields.has-overview {
+    display: grid;
+    grid-template-columns: clamp(440px, 36vw, 580px) minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .has-overview .ledger-col {
+    min-height: 0;
+    overflow-y: auto;
+    border-right: 1px solid var(--rule);
+  }
+  .has-overview .tally,
+  .has-overview .ledger,
+  .has-overview .actions,
+  .has-overview .note { max-width: none; }
+  .has-overview .tally {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: -1px;
+  }
+  .has-overview .actions { grid-template-columns: 1fr; padding-inline: 12px; }
+
+  /* The empty sheet has the whole desk to itself, so it takes a larger drawing. */
+  #scrFields:not(.has-overview) .empty { padding-block: 72px 56px; }
+  #scrFields:not(.has-overview) .empty svg { width: 224px; height: 168px; }
+
+  /* The drawing dock keeps its tools within reach of each other rather than
+     spread 240px apart across a desk. */
+  #editBar { padding-inline: max(0px, calc((100% - 1040px) / 2)); }
+  #editBar .tools { border-inline: 1px solid var(--rule); }
+
+  /* Settings runs in two columns, each pref kept whole, the colophon under both. */
+  #scrSettings { padding-inline: max(12px, calc((100% - 1320px) / 2)); }
+  .prefs { column-count: 2; column-gap: 0; }
+  #scrSettings .pref { max-width: none; margin-inline: 12px; break-inside: avoid; }
+  #scrSettings .colophon { max-width: 760px; margin-inline: 0; padding-inline: 26px; }
+}

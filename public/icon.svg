@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#E4E4DE"/>
+  <!-- the border band: the one idea the whole app turns on -->
+  <polygon points="150,168 372,140 392,332 256,398 128,306"
+           fill="none" stroke="#E08A00" stroke-width="40" stroke-linejoin="miter"/>
+  <polygon points="150,168 372,140 392,332 256,398 128,306"
+           fill="#14161A" fill-opacity="0.08" stroke="#14161A" stroke-width="12" stroke-linejoin="miter"/>
+  <g fill="#14161A">
+    <circle cx="150" cy="168" r="13"/><circle cx="372" cy="140" r="13"/>
+    <circle cx="392" cy="332" r="13"/><circle cx="256" cy="398" r="13"/>
+    <circle cx="128" cy="306" r="13"/>
+  </g>
+  <circle cx="258" cy="268" r="30" fill="#E4E4DE"/>
+  <circle cx="258" cy="268" r="19" fill="#14161A"/>
+</svg>

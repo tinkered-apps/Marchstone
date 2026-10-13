@@ -1,0 +1,27 @@
+{
+  "name": "marchstone",
+  "private": true,
+  "type": "module",
+  "description": "Mark an area on a map and get warned by colour, sound and vibration at its edge. Runs in the phone's browser, works offline, no account.",
+  "author": {
+    "name": "Kuba",
+    "email": "kuba@tinkered.app"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "wrangler dev --port 8123",
+    "test": "node test/geo.test.mjs && node test/track.test.mjs && node test/marks.test.mjs && node test/i18n.test.mjs && node test/version.test.mjs && node test/pages.test.mjs",
+    "test:e2e": "playwright test",
+    "deploy": "npm test && wrangler deploy"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "wrangler": "4.138.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260921.1": true
+  }
+}
