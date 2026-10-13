@@ -2,7 +2,22 @@
   <img src="public/social-card.png" alt="The Marchstone name next to an area outlined on a map, with a green panel reading: inside, 10 m." width="760">
 </p>
 
-# Marchstone
+<h1 align="center">Marchstone</h1>
+
+<p align="center">
+  <b>Mark an area. Your phone tells you when you reach its edge.</b><br>
+  Inside, outside or on the border, by colour, sound and vibration.
+</p>
+
+<p align="center">
+  <a href="https://marchstone.tinkered.app/"><b>▶ Open it</b></a>
+  &nbsp;·&nbsp; English and Polish
+  &nbsp;·&nbsp; installs as an app
+  &nbsp;·&nbsp; works offline
+  &nbsp;·&nbsp; no account
+</p>
+
+---
 
 A marchstone is the stone that says where one holding ends and the next begins.
 This is that stone, if it could shout.
