@@ -10,7 +10,7 @@
 /* Bump this and APP_VERSION in app.js together, by 0.01: this name is what
  * makes a phone fetch the new files, and that constant is what it then reports
  * in the footer. npm test fails if they differ. */
-const CACHE = 'marchstone-v1.00';
+const CACHE = 'marchstone-v1.01';
 const TILE_CACHE = 'fb-tiles-v1';
 const TILE_LIMIT = 6000;
 

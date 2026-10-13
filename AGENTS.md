@@ -31,7 +31,7 @@ npm may run. Update it when a Wrangler upgrade changes those versions.
 
 - `APP_VERSION` in `public/app.js` fills the footer. It started at 1.00.
 - `CACHE` in `public/sw.js` names the app cache and carries the same number
-  (`marchstone-v1.00`). A new name is what makes an installed phone fetch the new files.
+  (`marchstone-v1.01`). A new name is what makes an installed phone fetch the new files.
 - Bump both together, by 0.01, on a user-visible release and whenever `SHELL` or the caching
   rules change. `npm test` fails if they differ.
 - `SHELL` lists pages by their clean URLs (`./`, `./privacy`). Cloudflare redirects `index.html`
