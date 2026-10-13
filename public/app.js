@@ -26,7 +26,7 @@ const DEFAULTS = { buffer: 5, layer: 'satellite', keepAwake: true, muted: false,
  *
  * Two decimals, one step of 0.01 per release. A string, not a number, or 1.10
  * prints as 1.1 and the version on screen stops matching the one you shipped. */
-const APP_VERSION = '1.01';
+const APP_VERSION = '1.00';
 
 /* Hands a file to the browser's download. Lives here rather than in io.js,
  * which touches no page and is tested without one. */
