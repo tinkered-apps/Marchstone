@@ -1,7 +1,14 @@
 import { test, expect } from '@playwright/test';
+import { AxeBuilder } from '@axe-core/playwright';
 import fs from 'node:fs';
 
 const ORIGIN = 'http://localhost:8123';
+
+// Read from the source so a version bump does not need a matching edit here.
+// npm test checks that the cache name in sw.js carries the same number.
+const APP_VERSION = fs.readFileSync(new URL('../public/app.js', import.meta.url), 'utf8')
+  .match(/const APP_VERSION = '([^']+)'/)[1];
+const CACHE = `marchstone-v${APP_VERSION}`;
 
 // A 200 m square around 52.0 N, 21.0 E.
 const LAT = 52.0, LNG = 21.0;
@@ -82,7 +89,7 @@ test('the footer credits Kuba, and the page sends its security headers', async (
   expect(headers['x-content-type-options']).toBe('nosniff');
 
   const credit = page.locator('.footer-credit');
-  await expect(credit).toHaveText('Marchstone v1.00 by Kuba · tinkered.app · Privacy');
+  await expect(credit).toHaveText(`Marchstone v${APP_VERSION} by Kuba · tinkered.app · Privacy`);
   await expect(credit.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', 'privacy.html');
   await expect(credit.getByRole('link', { name: 'Kuba' }))
     .toHaveAttribute('href', 'mailto:kuba@tinkered.app');
@@ -105,16 +112,16 @@ test('the footer links to a privacy page that search engines skip', async ({ pag
   await page.goto('/');
   // Follow the link with the service worker in charge: Cloudflare redirects
   // privacy.html to /privacy, and a cached redirect would break the page.
-  await page.evaluate(async () => {
+  await page.evaluate(async (cache) => {
     await navigator.serviceWorker.ready;
     if (!navigator.serviceWorker.controller) {
       await new Promise((resolve) =>
         navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
     }
-    await caches.open('marchstone-v1.00').then(async (c) => {
+    await caches.open(cache).then(async (c) => {
       while (!(await c.match('./privacy'))) await new Promise((r) => setTimeout(r, 100));
     });
-  });
+  }, CACHE);
   await page.locator('.footer-credit').getByRole('link', { name: 'Privacy' }).click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
@@ -261,7 +268,9 @@ test('a backup holds every area and restores in a fresh browser', async ({ page,
   const download = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Back up every area' }).click();
   const file = await (await download).path();
-  expect(fs.readFileSync(file, 'utf8')).toContain('Test Square');
+  // A virus scanner can hold a fresh download for a moment, so the read is retried.
+  await expect(() => expect(fs.readFileSync(file, 'utf8')).toContain('Test Square'))
+    .toPass({ timeout: 10_000 });
 
   const fresh = await browser.newPage();
   await fresh.goto('/');
@@ -273,6 +282,63 @@ test('a backup holds every area and restores in a fresh browser', async ({ page,
   await expect(fresh.locator('.area-name', { hasText: 'Test Square' })).toBeVisible();
   await fresh.close();
 });
+
+test('the home page carries a link preview with a large image', async ({ page, request }) => {
+  await page.goto('/');
+  const meta = (name) => page.locator(`meta[property="${name}"], meta[name="${name}"]`);
+  await expect(meta('og:title')).toHaveAttribute('content', await page.title());
+  await expect(meta('og:description'))
+    .toHaveAttribute('content', await meta('description').getAttribute('content'));
+  await expect(meta('og:url')).toHaveAttribute('content', 'https://marchstone.tinkered.app/');
+  await expect(meta('twitter:card')).toHaveAttribute('content', 'summary_large_image');
+
+  const image = new URL(await meta('og:image').getAttribute('content'));
+  expect(image.origin).toBe('https://marchstone.tinkered.app');
+  const response = await request.get(image.pathname);
+  expect(response.headers()['content-type']).toBe('image/png');
+  // Width and height sit at bytes 16 to 23 of a PNG.
+  const png = await response.body();
+  expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+});
+
+// The desktop and mobile projects cover both layouts; this covers both themes.
+for (const theme of ['light', 'dark']) {
+  test(`axe finds no accessibility violations in the ${theme} theme`, async ({ page, context }, testInfo) => {
+    // Reduced motion ends transitions at once, so contrast is measured on the final colours.
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' });
+    await context.grantPermissions(['geolocation'], { origin: ORIGIN });
+    await context.setGeolocation({ latitude: LAT, longitude: LNG, accuracy: 4 });
+    // Every view is scanned before the assertion, so one run lists all violations.
+    const found = [];
+    const scan = async (view) => {
+      const { violations } = await new AxeBuilder({ page }).analyze();
+      for (const violation of violations) {
+        for (const node of violation.nodes) found.push(`${view}: ${violation.id}: ${node.target.join(' ')}`);
+      }
+    };
+
+    await page.goto('/');
+    await expect(page.locator('#scrFields')).toBeVisible();
+    await scan('no areas yet');
+    await importSquare(page, testInfo);
+    await scan('area list');
+    await page.getByRole('button', { name: 'Settings' }).click();
+    await expect(page.locator('#scrSettings')).toBeVisible();
+    await scan('settings');
+    await page.getByRole('button', { name: 'Back', exact: true }).click();
+    await page.getByRole('button', { name: 'Draw a new area' }).click();
+    await expect(page.locator('#map')).toBeVisible();
+    await scan('drawing');
+    await page.getByRole('button', { name: 'Back', exact: true }).click();
+    await page.locator('.area', { hasText: 'Test Square' }).getByRole('button', { name: 'Track' }).click();
+    await expect(page.locator('#trackPanel')).toHaveAttribute('data-status', 'inside');
+    await scan('tracking');
+    await page.goto('/privacy');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Privacy');
+    await scan('privacy');
+    expect(found).toEqual([]);
+  });
+}
 
 test('a file that is not a boundary is refused with a reason', async ({ page }, testInfo) => {
   const file = testInfo.outputPath('nonsense.geojson');
@@ -301,15 +367,15 @@ test('the app is installable and opens with no network', async ({ page, context 
         navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true }));
     }
   });
-  await expect.poll(() => page.evaluate(async () =>
-    (await (await caches.open('marchstone-v1.00')).keys()).length), { timeout: 15_000 })
+  await expect.poll(() => page.evaluate(async (cache) =>
+    (await (await caches.open(cache)).keys()).length, CACHE), { timeout: 15_000 })
     .toBeGreaterThanOrEqual(32);
 
   await context.setOffline(true);
   try {
     await page.reload();
     await expect(page.locator('.area-name', { hasText: 'Test Square' })).toBeVisible();
-    await expect(page.locator('.footer-credit')).toContainText('v1.00');
+    await expect(page.locator('.footer-credit')).toContainText('v' + APP_VERSION);
   } finally {
     await context.setOffline(false);
   }

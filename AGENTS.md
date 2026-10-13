@@ -6,11 +6,11 @@ commands and conventions.
 ## Commands
 
 ```bash
-npm install                       # dev dependencies only (wrangler, @playwright/test)
+npm install                       # dev dependencies only (wrangler, @playwright/test, @axe-core/playwright)
 npx playwright install chromium   # once, before the first e2e run
 npm start                         # wrangler dev on http://localhost:8123, with production headers
 npm test                          # unit tests: geometry, tracking, marks and files, version, pages
-npm run test:e2e                  # Playwright, desktop and mobile, against npm start
+npm run test:e2e                  # Playwright, desktop and mobile, against npm start; includes an axe scan in both themes
 npm run deploy                    # npm test, then wrangler deploy
 ```
 
@@ -88,6 +88,10 @@ hash and then drops it.
   asks web pages to identify themselves.
 
 `TILES` in `app.js` is also where to point the map at tiles you host yourself.
+
+The link preview is the `og:*` block in `index.html`, pointing to `public/social-card.png`
+(1200×630). The tags are static English with absolute URLs because crawlers do not run scripts,
+and the image is not in `SHELL` because no page loads it.
 
 The footer credit "Marchstone vX.XX by Kuba · tinkered.app · Privacy" links Kuba to
 `mailto:kuba@tinkered.app`, tinkered.app to `https://tinkered.app` and Privacy to `privacy.html`. The logo is inlined in
