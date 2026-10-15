@@ -45,3 +45,9 @@ coverage/
 .wrangler/
 .dev.vars
 .dev.vars.*
+
+# Marketing material (videos, renders): local only
+.marketing/
+
+# Marketing material (HyperFrames videos, renders); local only
+.marketing/
