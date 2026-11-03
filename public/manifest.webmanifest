@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Marchstone: Bounds & Marks",
   "short_name": "Marchstone",
-  "description": "Mark an area on a map and get warned by colour, sound and vibration when you reach or cross its edge. Drop numbered waypoints as you walk it. Works offline, no account.",
+  "description": "Mark an area on a map and get warned by color, sound and vibration when you reach or cross its edge. Drop numbered waypoints as you walk it. Works offline, no account.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
