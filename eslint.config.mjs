@@ -6,7 +6,8 @@ import globals from 'globals';
 
 export default [
   // public/vendor/ is other people's code, copied in as released.
-  { ignores: ['node_modules/', 'test-results/', 'playwright-report/', '.wrangler/', 'public/vendor/'] },
+  // .marketing/ is local, git-ignored material (gallery and video scripts), not the app.
+  { ignores: ['node_modules/', 'test-results/', 'playwright-report/', '.wrangler/', 'public/vendor/', '.marketing/'] },
 
   js.configs.recommended,
   // An unused name in `catch (error)` is harmless and the app ships those as written.
